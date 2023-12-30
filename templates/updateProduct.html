@@ -1,19 +1,10 @@
 {% extends "/base/base_admin.html" %}
-{% block title %}Admin - Add product{% endblock %}
+{% block title %}Admin - Update product{% endblock %}
 
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %}
 
-<style>
-    h1 {margin-left: 217px; margin-top:20px;
-    }
-    form {display: inline-block; width:70%; margin-left: 217px;
-    }
-    form>div {padding: 10px 0; font-size: 20px;
-    }
-</style>
-
-<h1 class="display-4">Add products</h1>
+<h1 class="display-4">Update product details</h1>
 
 <form method="POST" action="">
     <div class="form-group">
@@ -36,4 +27,3 @@
     <input type="submit" value="Submit" class="btn btn-primary"/>
 </form>
 {% endblock %}
-

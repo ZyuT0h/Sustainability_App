@@ -61,14 +61,9 @@ def add_product():
         products_dict[product.get_product_id()] = product
         db['Products'] = products_dict
 
-        # Test codes
-        products_dict = db['Products']
-        product = products_dict[product.get_product_id()]
-        print(product.get_product_name(), "was stored in product.db successfully with product_id ==", product.get_product_id())
-        
         db.close()
 
-        return redirect(url_for('home_admin'))
+        return redirect(url_for('manage_inventory'))
     return render_template('addProduct.html', form=create_product_form)
 
 
@@ -86,7 +81,54 @@ def manage_inventory():
     
     return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
 
+@app.route('/updateProduct/<int:id>/', methods=['GET','POST'])
+def update_product(id):
+    update_product_form = CreateProductForm(request.form)
+    if request.method == 'POST' and update_product_form.validate():
+        products_dict = {}
+        db = shelve.open('product.db', 'w')
+        products_dict = db['Products']
 
+        product = products_dict.get(id)
+        product.set_product_name(update_product_form.product_name.data)
+        product.set_category(update_product_form.category.data)
+        product.set_stock(update_product_form.stock.data)
+        product.set_price(update_product_form.price.data)
+        product.set_description(update_product_form.description.data)
+
+        db['Products'] = products_dict
+        db.close()
+
+        return redirect(url_for('manage_inventory'))
+    else:
+        products_dict = {}
+        db = shelve.open('product.db', 'r')
+        products_dict = db['Products']
+        db.close()
+
+        product = products_dict.get(id)
+        update_product_form.product_name.data = product.get_product_name()
+        update_product_form.category.data = product.get_category()
+        update_product_form.stock.data = product.get_stock()
+        update_product_form.price.data = product.get_price()
+        update_product_form.description.data = product.get_description()
+
+        return render_template('updateProduct.html', form=update_product_form)
+
+
+@app.route('/deleteProduct/<int:id>', methods=['POST'])
+def delete_product(id):
+    products_dict = {}
+    db = shelve.open('product.db', 'w')
+    products_dict = db['Products']
+
+    products_dict.pop(id)
+
+    db['Products'] = products_dict
+    db.close()
+
+    return redirect(url_for('manage_inventory'))
+    
 @app.route('/forum')
 def forum():
     return render_template('forum.html')
