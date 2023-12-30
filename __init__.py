@@ -81,7 +81,8 @@ def manage_inventory():
     
     return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
 
-@app.route('/updateProduct/<int:id>/', methods=['GET','POST'])
+
+@app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
 def update_product(id):
     update_product_form = CreateProductForm(request.form)
     if request.method == 'POST' and update_product_form.validate():
@@ -128,6 +129,7 @@ def delete_product(id):
     db.close()
 
     return redirect(url_for('manage_inventory'))
+    
     
 @app.route('/forum')
 def forum():
