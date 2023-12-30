@@ -1,9 +1,49 @@
-{% extends "/base/base_admin.html" %}
-{% block title %}Shop - Cart{% endblock %}
+{% extends "base/base_admin.html" %}
+{% block title %}Inventory Management{% endblock %}
 
 {% block content %}
-{% from "includes/_formHelper.html" import render_field %}
-
-<h1 class="display-4">Manage Inventory</h1>
-<p>Hi, this is for admins to view and manage inventory</p>
+<h1 class="display-4">Inventory Management</h1>
+<div>
+ {% if count == 0 %}
+ <p>There are no products.</p>
+ {% elif count == 1 %}
+ <p>There is 1 product.</p>
+ {% else %}
+ <p>There are {{ count }} products.</p>
+ {% endif %}
+</div>
+<div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product in products_list %}
+        <tr>
+            <td>{{ product.get_product_id() }}</td>
+            <td>{{ product.get_product_name() }}</td>
+            <td>{{ product.get_category() }}</td>
+            <td>{{ product.get_stock() }}</td>
+            <td>{{ product.get_price() }}</td>
+            <td>{{ product.get_description() }}</td>
+            <td><a href="#" class="btn btn-warning">Update</a></td>
+            <td>
+                <form action="" method="POST">
+                    <input type="submit" value="Delete" class="btn btn-danger">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
