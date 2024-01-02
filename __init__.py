@@ -22,6 +22,13 @@ def user_login():
 
 @app.route('/adminLogin')
 def admin_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == 'admin' and password == 'password':
+            return 'Login Successful!'
+        else:
+            return 'Login Failed. Invalid credentials.'
     return render_template('adminLogin.html')
 
 
@@ -51,4 +58,4 @@ def forum():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
