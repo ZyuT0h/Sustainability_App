@@ -17,15 +17,24 @@ def home_admin():
 
 @app.route('/userLogin')
 def user_login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        if email == 'user@example.com' and password == 'password':
+            return 'Login Successful!'
+        else:
+            return 'Login Failed. Invalid credentials.'
     return render_template('userLogin.html')
 
 
-@app.route('/adminLogin')
+@app.route('/adminLogin', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        username = request.form['username']
+        staff_id = request.form['staff_id']
         password = request.form['password']
-        if username == 'admin' and password == 'password':
+        
+        if staff_id == 'staff123' and password == 'password':
             return 'Login Successful!'
         else:
             return 'Login Failed. Invalid credentials.'
