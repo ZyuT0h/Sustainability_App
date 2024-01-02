@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
-from forms import CreateUserForm
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def home():
@@ -48,14 +48,6 @@ def manage_inventory():
 @app.route('/forum')
 def forum():
     return render_template('forum.html')
-
-
-@app.route('/CreateUser', methods=['GET', 'POST'])
-def create_user():
-    create_user_form = CreateUserForm(request.form)
-    if request.method == 'POST' and create_user_form.validate():
-        return redirect(url_for('home'))
-    return render_template('CreateUser.html', form=create_user_form)
 
 
 if __name__ == '__main__':
