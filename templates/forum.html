@@ -2,9 +2,24 @@
 {% block title %}Library Loan System - Home{% endblock %}
 
 {% block content %}
+<style>
+    .column{
+    width: 350px;
+    height: 350px;
+    margin: 12px 20px;
 
+  }
+.row{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+</style>
 <br>
     <div class="row">
+        <div class="column">
+
         <h6>Discuss your opinion with staff and other customers</h6>
         <p>
             This is a forum page for our beloved customers to ask questions.
@@ -15,9 +30,10 @@
             This forum is also for customers to share their experiences with us. We appreciate the feedback.
             Since this will inform us about how our company is performing and how we could do better.
         </p>
-    </div>
 
-    <div>
+        </div>
+
+        <div class="column">
         <form onsubmit="event.preventDefault();">
             <fieldset>
                 <textarea id="subject" placeholder="subject(question/review)"></textarea>
@@ -29,21 +45,26 @@
             </fieldset>
         </form>
         </div>
+    </div>
             <br><br>
-
+    <div>
+     {% if count == 0 %}
+     <p>There are no products.</p>
+     {% elif count == 1 %}
+     <p>There is 1 product.</p>
+     {% else %}
+     <p>There are {{ count }} products.</p>
+     {% endif %}
+    </div>
             <fieldset>
-                <h1> FORUM</h1>
+                <h1>FORUM</h1>
                 <hr>
                 <div id="commentsList">
                     K***:<br>
                     Example 1
-                    <textarea></textarea>
-                    <hr>
-                    R***<br>
-                    Example 2
+                    <input type="text" placeholder="REPLY">
                     <hr>
                 </div>
             </fieldset>
-
         <br>
 {% endblock %}
