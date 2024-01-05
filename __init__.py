@@ -19,7 +19,7 @@ def home_admin():
 
 @app.route('/register', methods=['GET'])
 def register():
-    return render_template('register.html')fkfm
+    return render_template('register.html')
 
 @app.route('/userLogin')
 def user_login():
