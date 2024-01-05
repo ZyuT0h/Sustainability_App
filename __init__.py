@@ -30,8 +30,16 @@ def user_login():
     return render_template('userLogin.html')
 
 
-@app.route('/adminLogin')
+@app.route('/adminLogin', methods=['GET', 'POST'])
 def admin_login():
+    if request.method == 'POST':
+        staff_id = request.form['staff_id']
+        password = request.form['password']
+
+        if staff_id == 'staff123' and password == 'password':
+            return 'Login Successful!'
+        else:
+            return 'Login Failed. Invalid credentials.'
     return render_template('adminLogin.html')
 
 
@@ -50,10 +58,13 @@ def add_product():
     if request.method == 'POST' and create_product_form.validate():
         products_dict = {}
         db = shelve.open('product.db', 'c')
+
         try:
             products_dict = db['Products']
+
         except:
             print('Error in retrieving Products from product.db.')
+
         product = Product.Product(create_product_form.product_name.data,
                                   create_product_form.category.data,
                                   create_product_form.stock.data,
@@ -61,7 +72,9 @@ def add_product():
                                   create_product_form.description.data)
         products_dict[product.get_product_id()] = product
         db['Products'] = products_dict
+
         db.close()
+
         return redirect(url_for('manage_inventory'))
     return render_template('addProduct.html', form=create_product_form)
 
