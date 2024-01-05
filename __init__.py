@@ -163,5 +163,15 @@ def forum():
     return render_template('forum.html')
 
 
+@app.route('/updatePoints')
+def points():
+    return render_template('updatePoints.html')
+
+
+@app.route('/adminForum')
+def admin_forum():
+    return render_template('adminForum.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
