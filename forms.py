@@ -7,6 +7,6 @@ class CreateProductForm(Form):
     category = SelectField('Category:', [validators.DataRequired()], choices=[('','Select'),('Coasters', 'Coasters'),
                                                                              ('Tote bags', 'Tote bags'),('Pouches',
                                                                                             'Pouches')], default='')
-    stock = StringField('Stock:', [validators.Length(min=1, max=150), validators.DataRequired()])
+    stock = StringField('Stockssssss:', [validators.Length(min=1, max=150), validators.DataRequired()])
     price = StringField('Price:', [validators.Length(min=1, max=150), validators.DataRequired()])
     description = TextAreaField('Description:', [validators.Optional()])
