@@ -9,3 +9,4 @@ class CreateProductForm(Form):
     stock = StringField('Stockssssss:', [validators.Length(min=1, max=150), validators.DataRequired()])
     price = StringField('Price:', [validators.Length(min=1, max=150), validators.DataRequired()])
     description = TextAreaField('Description:', [validators.Optional()])
+kdfjn
