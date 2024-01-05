@@ -48,6 +48,26 @@ def cart():
     return render_template('cart.html')
 
 
+# Example orders dictionary (Replace this with your actual order storage)
+orders = {
+    'customer1': {'order_quantity': 5, 'total_spending': 100, 'order_status': 'Completed'},
+    'customer2': {'order_quantity': 8, 'total_spending': 200, 'order_status': 'Pending'},
+}
+
+@app.route('/order_details')
+def order_details():
+    order_data = []
+
+    for customer_id, order_info in orders.items():
+        order_data.append({
+            'customer_id': customer_id,
+            'order_quantity': order_info['order_quantity'],
+            'total_spending': order_info['total_spending'],
+            'order_status': order_info['order_status']
+        })
+
+    return render_template('order_details.html', orders=order_data)
+
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
     create_product_form = CreateProductForm(request.form)
