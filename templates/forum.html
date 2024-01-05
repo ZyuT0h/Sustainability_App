@@ -4,5 +4,42 @@
 {% block content %}
 
   <h1> Forum Page</h1>
+ <br><br>
 
+        <div class="c1">I would be delighted to help any crocheters and would love to
+            see all of your one-of-a-kind crochet creations!
+            Please contact me at <a href="mailto:zactoh0503@gmail.com">zactoh0503@gmail.com</a>
+            or fill out the form below! By filling out the form below, everyone can assist you
+            with your problem or share your masterpiece so that everyone can view your incredible creations.
+        </div>
+
+        <br><br>
+
+        <form onsubmit="event.preventDefault();">
+            <fieldset>
+                <br><br>
+                <label for="message">Message:</label><textarea id="message"
+                                                               placeholder="...share your experience/problem/feedback"
+                                                               required></textarea>
+
+                <br><button type="button" onclick="submitComment()" class="cbutton">SUBMIT</button>
+                <input type="reset" value="Reset" class="cbutton">
+            </fieldset>
+        </form>
+
+            <br><br>
+
+            <fieldset>
+                <legend>Forum: </legend>
+                <div id="commentsList">
+                    Kai (kai@gmail.com):<br>
+                    Example 1
+                    <hr>
+                    Ryu (ryu@hotmail.com):<br>
+                    Example 2
+                    <hr>
+                </div>
+            </fieldset>
+
+        <br>
 {% endblock %}
