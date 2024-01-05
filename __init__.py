@@ -30,16 +30,8 @@ def user_login():
     return render_template('userLogin.html')
 
 
-@app.route('/adminLogin', methods=['GET', 'POST'])
+@app.route('/adminLogin')
 def admin_login():
-    if request.method == 'POST':
-        staff_id = request.form['staff_id']
-        password = request.form['password']
-        
-        if staff_id == 'staff123' and password == 'password':
-            return 'Login Successful!'
-        else:
-            return 'Login Failed. Invalid credentials.'
     return render_template('adminLogin.html')
 
 
