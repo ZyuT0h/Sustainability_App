@@ -17,6 +17,10 @@ def home_user():
 def home_admin():
     return render_template('homeAdmin.html')
 
+@app.route('/register', methods=['GET'])
+def register():
+    return render_template('register.html')
+
 @app.route('/userLogin')
 def user_login():
     if request.method == 'POST':
