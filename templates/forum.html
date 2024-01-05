@@ -3,8 +3,28 @@
 
 {% block content %}
 
+<style>
+    textarea{
+    max-length: 50
+    }
+
+    .row{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    }
+
+    .column{
+    width: 350px;
+    height: 350px;
+    margin: 12px 20px;
+    }
+</style>
+
 <br>
     <div class="row">
+        <div class="column">
         <h6>Discuss your opinion with staff and other customers</h6>
         <p>
             This is a forum page for our beloved customers to ask questions.
@@ -15,35 +35,34 @@
             This forum is also for customers to share their experiences with us. We appreciate the feedback.
             Since this will inform us about how our company is performing and how we could do better.
         </p>
-    </div>
+        </div>
 
-    <div>
+
+        <div class="column">
         <form onsubmit="event.preventDefault();">
             <fieldset>
                 <textarea id="subject" placeholder="subject(question/review)"></textarea>
                 <br>
                 <textarea id="message" placeholder="message" required></textarea>
                 <br>
-                <button type="button" onclick="submitComment()" class="cbutton">SUBMIT</button>
-                <input type="reset" value="Reset" class="cbutton">
+                <button type="button" onclick="submitComment()" class="sbutton">SUBMIT</button>
+                <input type="reset" value="CLEAR" class="cbutton">
             </fieldset>
         </form>
         </div>
-            <br><br>
+    </div>
+<br>
+<br>
+    <fieldset>
+        <h1> FORUM</h1>
+        <hr>
+        <div id="commentsList">
+            K***:<br>
+            Example 1
+            <textarea placeholder="REPLY"></textarea>
+            <hr>
+        </div>
+    </fieldset>
 
-            <fieldset>
-                <h1> FORUM</h1>
-                <hr>
-                <div id="commentsList">
-                    K***:<br>
-                    Example 1
-                    <textarea></textarea>
-                    <hr>
-                    R***<br>
-                    Example 2
-                    <hr>
-                </div>
-            </fieldset>
-
-        <br>
+<br>
 {% endblock %}
