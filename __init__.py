@@ -158,7 +158,7 @@ def points():
 
 
 @app.route('/adminForum')
-def points():
+def admin_forum():
     return render_template('adminForum.html')
 
 
