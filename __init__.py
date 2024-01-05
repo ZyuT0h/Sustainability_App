@@ -51,6 +51,7 @@ def shop():
 def cart():
     return render_template('cart.html')
 
+
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
     create_product_form = CreateProductForm(request.form)
@@ -86,6 +87,7 @@ def manage_inventory():
         products_list.append(product)
 
     return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
+
 
 @app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
 def update_product(id):
@@ -127,6 +129,7 @@ def delete_product(id):
     db.close()
 
     return redirect(url_for('manage_inventory'))
+
 
 @app.route('/forum')
 def forum():
