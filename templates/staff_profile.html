@@ -1,8 +1,30 @@
+<!-- staff_profiles.html -->
 {% extends "/base/base_admin.html" %}
-{% block title %}Library Loan System - Home{% endblock %}
+{% block title %}Staff Profiles{% endblock %}
 
 {% block content %}
-
-<h1 class="display-4">update staff profile</h1>
-
+<div class="container">
+    <h1>Staff Profiles</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Staff ID</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff in staff_data %}
+                <tr>
+                    <td>{{ staff['staff_id'] }}</td>
+                    <td>{{ staff['email'] }}</td>
+                    <td>
+                        <a href="/edit_staff/{{ staff['staff_id'] }}">Edit</a>
+                        <a href="/delete_staff/{{ staff['staff_id'] }}">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

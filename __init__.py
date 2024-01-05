@@ -48,6 +48,17 @@ def cart():
     return render_template('cart.html')
 
 
+staff_data = [
+    {'staff_id': '1', 'email': 'staff1@example.com'},
+    {'staff_id': '2', 'email': 'staff2@example.com'},
+    # ...
+]
+
+@app.route('/staff_profile')
+def staff_profiles():
+    return render_template('staff_profile.html', staff_data=staff_data)
+
+
 # Example orders dictionary (Replace this with your actual order storage)
 orders = {
     'customer1': {'order_quantity': 5, 'total_spending': 100, 'order_status': 'Completed'},
