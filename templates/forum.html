@@ -4,8 +4,12 @@
 {% block content %}
 
 <style>
-    textarea{
-    max-length: 50
+    #subject{
+    width: 300px
+    }
+
+    #message{
+
     }
 
     .row{
@@ -41,17 +45,17 @@
         <div class="column">
         <form onsubmit="event.preventDefault();">
             <fieldset>
-                <textarea id="subject" placeholder="subject(question/review)"></textarea>
-                <br>
-                <textarea id="message" placeholder="message" required></textarea>
-                <br>
+
+                <input type="text" id="subject" placeholder="subject(question/review)">
+                <br><br>
+                <input type="text" id="message" placeholder="message" required>
+                <br><br>
                 <button type="button" onclick="submitComment()" class="sbutton">SUBMIT</button>
                 <input type="reset" value="CLEAR" class="cbutton">
             </fieldset>
         </form>
         </div>
     </div>
-<br>
 <br>
     <fieldset>
         <h1> FORUM</h1>
