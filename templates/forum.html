@@ -6,7 +6,7 @@
     .column{
     width: 350px;
     height: 350px;
-    margin: 12px 20px;
+    margin: 12px 12px;
 
   }
 .row{
@@ -28,7 +28,7 @@
         <h6>Give us a REVIEW!</h6>
         <p>
             This forum is also for customers to share their experiences with us. We appreciate the feedback.
-            Since this will inform us about how our company is performing and how we could do better.
+            Thank you letting us know how our company is performing and how we could do better.
         </p>
 
         </div>
@@ -40,31 +40,66 @@
                 <br>
                 <textarea id="message" placeholder="message" required></textarea>
                 <br>
-                <button type="button" onclick="submitComment()" class="cbutton">SUBMIT</button>
-                <input type="reset" value="Reset" class="cbutton">
+                <button type="button" onclick="submitComment()" class="sbutton">SUBMIT</button>
+                <input type="reset" value="Clear" class="cbutton">
             </fieldset>
         </form>
         </div>
     </div>
-            <br><br>
-    <div>
-     {% if count == 0 %}
-     <p>There are no products.</p>
-     {% elif count == 1 %}
-     <p>There is 1 product.</p>
-     {% else %}
-     <p>There are {{ count }} products.</p>
-     {% endif %}
-    </div>
-            <fieldset>
-                <h1>FORUM</h1>
-                <hr>
-                <div id="commentsList">
-                    K***:<br>
-                    Example 1
-                    <input type="text" placeholder="REPLY">
-                    <hr>
-                </div>
-            </fieldset>
-        <br>
+    <h1>FORUM</h1>
+    <hr>
+        <div id="commentsList">
+            {% for comment in comments %}
+                {{ comment.username }}:<br>
+                {{ comment.subject }}<br>
+                {{ comment.message }}<br>
+                <input type="text" placeholder="REPLY"><hr>
+            {% endfor %}
+        </div>
+
+<script>
+    function submitComment() {
+        var subject = document.getElementById("subject").value;
+        var message = document.getElementById("message").value;
+
+        fetch('/submit_comment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ subject: subject, message: message }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'success' && Array.isArray(data.comments)) {
+                // Clear the commentsList before appending new comments
+                var commentsList = document.getElementById("commentsList");
+                commentsList.innerHTML = "";
+
+                // Append the new comments to the commentsList
+                data.comments.forEach(comment => {
+                    appendNewComment(comment);
+                });
+            } else {
+                throw new Error('Data received from server is not in the expected format');
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+
+    function appendNewComment(comment) {
+    // Append the new comment to the existing comments on the client side
+    var commentsList = document.getElementById("commentsList");
+    commentsList.innerHTML += comment.username + ":<br>" + comment.subject + "<br>" + comment.message + "<br><input type='text' placeholder='REPLY'><hr>";
+}
+
+</script>
+
 {% endblock %}

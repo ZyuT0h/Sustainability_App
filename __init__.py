@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from Forms import CreateProductForm
 import shelve, Product
 
@@ -9,17 +9,21 @@ app = Flask(__name__)
 def home():
     return render_template('home.html')
 
+
 @app.route('/homeUser')
 def home_user():
     return render_template('homeUser.html')
+
 
 @app.route('/homeAdmin')
 def home_admin():
     return render_template('homeAdmin.html')
 
+
 @app.route('/register', methods=['GET'])
 def register():
     return render_template('register.html')
+
 
 @app.route('/userLogin')
 def user_login():
@@ -43,6 +47,7 @@ def admin_login():
 def shop():
     return render_template('shop.html')
 
+
 @app.route('/cart')
 def cart():
     return render_template('cart.html')
@@ -54,6 +59,7 @@ staff_data = [
     # ...
 ]
 
+
 @app.route('/staff_profile')
 def staff_profiles():
     return render_template('staff_profile.html', staff_data=staff_data)
@@ -64,6 +70,7 @@ orders = {
     'customer1': {'order_quantity': 5, 'total_spending': 100, 'order_status': 'Completed'},
     'customer2': {'order_quantity': 8, 'total_spending': 200, 'order_status': 'Pending'},
 }
+
 
 @app.route('/order_details')
 def order_details():
@@ -78,6 +85,7 @@ def order_details():
         })
 
     return render_template('order_details.html', orders=order_data)
+
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
@@ -160,7 +168,37 @@ def delete_product(id):
 
 @app.route('/forum')
 def forum():
-    return render_template('forum.html')
+    comments = get_comments()
+    return render_template('forum.html', comments=comments)
+
+
+@app.route('/submit_comment', methods=['POST'])
+def submit_comment():
+    data = request.get_json()
+    username = "someusername"  # Replace with the actual username after it can be retrieved
+
+    # Save the comment to the shelve file
+    save_comment(username, data['subject'], data['message'])
+
+    # Respond with the updated comments
+    comments = get_comments()
+    response_data = {'status': 'success', 'comments': comments}
+    return jsonify(response_data)
+
+
+def get_comments():
+    # Open the shelve file and retrieve comments
+    with shelve.open('comments.db') as db:
+        comments = db.get('comments', [])
+    return comments
+
+
+def save_comment(username, subject, message):
+    # Open the shelve file, retrieve existing comments, add the new comment, and save it
+    with shelve.open('comments.db') as db:
+        comments = db.get('comments', [])
+        comments.append({'username': username, 'subject': subject, 'message': message})
+        db['comments'] = comments
 
 
 @app.route('/updatePoints')
