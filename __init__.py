@@ -52,18 +52,45 @@ def shop():
 def cart():
     return render_template('cart.html')
 
-
 staff_data = [
     {'staff_id': '1', 'email': 'staff1@example.com'},
     {'staff_id': '2', 'email': 'staff2@example.com'},
     # ...
 ]
 
-
 @app.route('/staff_profile')
 def staff_profiles():
     return render_template('staff_profile.html', staff_data=staff_data)
 
+@app.route('/update_staff/<staff_id>', methods=['GET', 'POST'])
+def update_staff(staff_id):
+    if request.method == 'POST':
+        update_staff_email = request.form['updateStaffEmail']
+        # Update staff email in staff_data
+        for staff in staff_data:
+            if staff['staff_id'] == staff_id:
+                staff['email'] = update_staff_email
+        return redirect('/staff_profiles')
+    return render_template('update_staff_profile.html', staff_id=staff_id)
+
+@app.route('/update_staff_profile/<staff_id>', methods=['POST'])
+def update_staff_profile(staff_id):
+    update_staff_email = request.form['updateStaffEmail']
+
+    # Find the staff member in staff_data and update the email
+    for staff in staff_data:
+        if staff['staff_id'] == staff_id:
+            staff['email'] = update_staff_email
+            break
+
+    return redirect('/staff_profile')
+
+@app.route('/delete_staff/<staff_id>')
+def delete_staff(staff_id):
+    # Delete staff profile from staff_data
+    global staff_data
+    staff_data = [staff for staff in staff_data if staff['staff_id'] != staff_id]
+    return redirect(url_for('staff_profiles'))
 
 # Example orders dictionary (Replace this with your actual order storage)
 orders = {

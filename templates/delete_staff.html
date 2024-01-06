@@ -1,0 +1,30 @@
+{% extends "/base/base_admin.html" %}
+{% block title %}Delete Staff Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Delete Staff Profile</h1>
+    <div class="modal" id="deleteStaffModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Confirmation</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                Are you sure you want to delete this staff profile?
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <a href="/delete_staff/{{ staff_id }}" class="btn btn-danger">Delete</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
