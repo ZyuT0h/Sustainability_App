@@ -3,11 +3,44 @@
 
 {% block content %}
 
-    <fieldset>
-        <h1>FORUM</h1>
+    <br>
+
+    <h1>Forum</h1>
+
+    {% if admin %}
         <hr>
         <div id="commentsList">
+            {% for comment in comments %}
+                {{ comment.username }}:<br>
+                {{ comment.subject }}<br>
+                {{ comment.message }}<br>
+                <input type="text" placeholder="REPLY"><hr>
+            {% endfor %}
         </div>
-    </fieldset>
+    {% endif %}
+
+    <script>
+        function submitReply(commentId) {
+            // Get the reply content from the input field
+            var replyContent = document.getElementById("replyInput_" + commentId).value;
+
+            // Send the reply data to the server for processing
+            fetch('/submit_reply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ commentId: commentId, replyContent: replyContent }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle any response from the server (if needed)
+                console.log(data);
+            });
+
+            // Clear the reply input field after submitting
+            document.getElementById("replyInput_" + commentId).value = "";
+        }
+    </script>
 
 {% endblock %}

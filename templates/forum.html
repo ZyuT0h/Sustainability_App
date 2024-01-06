@@ -77,6 +77,7 @@
         })
         .then(data => {
             if (data && data.status === 'success' && Array.isArray(data.comments)) {
+
                 // Clear the commentsList before appending new comments
                 var commentsList = document.getElementById("commentsList");
                 commentsList.innerHTML = "";

@@ -208,7 +208,23 @@ def points():
 
 @app.route('/adminForum')
 def admin_forum():
-    return render_template('adminForum.html')
+    # Retrieve comments for the admin forum
+    comments = get_comments()
+
+    return render_template('adminForum.html', comments=comments, admin=True)
+
+
+@app.route('/submit_reply', methods=['POST'])
+def submit_reply():
+    data = request.get_json()
+    comment_id = data.get('commentId')
+    reply_content = data.get('replyContent')
+
+    # Process and store the reply data as needed
+    # For example, you can store it in the same comments.db file
+
+    response_data = {'status': 'success', 'message': 'Reply submitted successfully'}
+    return jsonify(response_data)
 
 
 if __name__ == '__main__':
