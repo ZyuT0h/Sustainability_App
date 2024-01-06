@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "/base/base_admin.html" %}
+{% block title %}Update Staff Profile{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="container">
+    <h1>Update Staff Profile</h1>
+    <form action="/update_staff_profile/{{ staff_id }}" method="post">
+        <div class="form-group">
+            <label for="updateStaffEmail">Update Staff Email:</label>
+            <input type="email" class="form-control" id="updateStaffEmail" name="updateStaffEmail" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
