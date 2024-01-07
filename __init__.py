@@ -252,7 +252,7 @@ def forum():
 @app.route('/submit_comment', methods=['POST'])
 def submit_comment():
     data = request.get_json()
-    username = "someusername"  # Replace with the actual username after it can be retrieved
+    username = "C_username"  # Replace with the actual username after it can be retrieved
 
     # Save the comment to the shelve file
     save_comment(username, data['subject'], data['message'])
@@ -285,23 +285,10 @@ def points():
 
 @app.route('/adminForum')
 def admin_forum():
-    # Retrieve comments for the admin forum
+    # retrieve comments for the admin side forum
     comments = get_comments()
 
     return render_template('adminForum.html', comments=comments, admin=True)
-
-
-@app.route('/submit_reply', methods=['POST'])
-def submit_reply():
-    data = request.get_json()
-    comment_id = data.get('commentId')
-    reply_content = data.get('replyContent')
-
-    # Process and store the reply data as needed
-    # For example, you can store it in the same comments.db file
-
-    response_data = {'status': 'success', 'message': 'Reply submitted successfully'}
-    return jsonify(response_data)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 {% block title %}Library Loan System - Home{% endblock %}
 
 {% block content %}
+
 <style>
     .column{
     width: 350px;
@@ -16,46 +17,6 @@
     justify-content: center;
 }
 </style>
-<br>
-    <div class="row">
-        <div class="column">
-
-        <h6>Discuss your opinion with staff and other customers</h6>
-        <p>
-            This is a forum page for our beloved customers to ask questions.
-            Staff and other customers can suggest their opinion.
-        </p>
-        <h6>Give us a REVIEW!</h6>
-        <p>
-            This forum is also for customers to share their experiences with us. We appreciate the feedback.
-            Thank you letting us know how our company is performing and how we could do better.
-        </p>
-
-        </div>
-
-        <div class="column">
-        <form onsubmit="event.preventDefault();">
-            <fieldset>
-                <textarea id="subject" placeholder="subject(question/review)"></textarea>
-                <br>
-                <textarea id="message" placeholder="message" required></textarea>
-                <br>
-                <button type="button" onclick="submitComment()" class="sbutton">SUBMIT</button>
-                <input type="reset" value="Clear" class="cbutton">
-            </fieldset>
-        </form>
-        </div>
-    </div>
-    <h1>FORUM</h1>
-    <hr>
-        <div id="commentsList">
-            {% for comment in comments %}
-                {{ comment.username }}:<br>
-                {{ comment.subject }}<br>
-                {{ comment.message }}<br>
-                <input type="text" placeholder="REPLY"><hr>
-            {% endfor %}
-        </div>
 
 <script>
     function submitComment() {
@@ -87,7 +48,7 @@
                     appendNewComment(comment);
                 });
             } else {
-                throw new Error('Data received from server is not in the expected format');
+                throw new Error('Data received from the server is not in the expected format');
             }
         })
         .catch(error => {
@@ -96,11 +57,50 @@
     }
 
     function appendNewComment(comment) {
-    // Append the new comment to the existing comments on the client side
-    var commentsList = document.getElementById("commentsList");
-    commentsList.innerHTML += comment.username + ":<br>" + comment.subject + "<br>" + comment.message + "<br><input type='text' placeholder='REPLY'><hr>";
-}
+        // Append the new comment to the existing comments on the customer side
+        var commentsList = document.getElementById("commentsList");
+        commentsList.innerHTML += comment.username + ":<br>" + comment.subject + "<br>" + comment.message + "<br><input type='text' placeholder='REPLY'><hr>";
+    }
+
 
 </script>
 
+<br>
+    <div class="row">
+        <div class="column">
+        <h6>Discuss your opinion with staff and other customers</h6>
+        <p>
+            This is a forum page for our beloved customers to ask questions.
+            Staff and other customers can suggest their opinion.
+        </p>
+        <h6>Give us a REVIEW!</h6>
+        <p>
+            This forum is also for customers to share their experiences with us. We appreciate the feedback.
+            Thank you letting us know how our company is performing and how we could do better.
+        </p>
+        </div>
+
+        <div class="column">
+        <form onsubmit="event.preventDefault();">
+            <fieldset>
+                <textarea id="subject" placeholder="subject(question/review)"></textarea>
+                <br>
+                <textarea id="message" placeholder="message" required></textarea>
+                <br>
+                <button type="button" onclick="submitComment()" class="sbutton">SUBMIT</button>
+                <input type="reset" value="ClEAR" class="cbutton">
+            </fieldset>
+        </form>
+        </div>
+    </div>
+
+    <h1>FORUM</h1><hr>
+    <div id="commentsList">
+        {% for comment in comments %}
+            {{ comment.username }}:<br>
+            {{ comment.subject }}<br>
+            {{ comment.message }}<br>
+            <input type="text" placeholder='REPLY'><hr>
+        {% endfor %}
+    </div>
 {% endblock %}
