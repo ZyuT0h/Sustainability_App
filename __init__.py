@@ -4,6 +4,7 @@ import bcrypt
 import shelve, Product
 import shelve
 
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -278,9 +279,15 @@ def save_comment(username, subject, message):
         db['comments'] = comments
 
 
-@app.route('/updatePoints')
-def points():
-    return render_template('updatePoints.html')
+@app.route('/pointSystem')
+def point_system(customer_id):
+    customer_points = {
+        'customer_id': customer_id,
+        'points_collected': 100,
+        'points_redeemed': 50,
+        'points_left': 50,
+    }
+    return render_template('pointSystem.html', customer_points=customer_points)
 
 
 @app.route('/adminForum')
