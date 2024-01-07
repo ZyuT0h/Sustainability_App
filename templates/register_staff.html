@@ -1,0 +1,20 @@
+<!-- register_staff.html -->
+{% extends "/base/base_admin.html" %}
+{% block title %}Register Staff{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Register New Staff</h1>
+    <form method="POST" action="/register_staff">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

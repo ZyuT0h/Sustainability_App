@@ -53,8 +53,8 @@ def cart():
     return render_template('cart.html')
 
 staff_data = [
-    {'staff_id': '1', 'email': 'staff1@example.com'},
-    {'staff_id': '2', 'email': 'staff2@example.com'},
+    {'staff_id': '1', 'name': 'John Doe', 'email': 'staff1@example.com'},
+    {'staff_id': '2', 'name': 'Jane Smith', 'email': 'staff2@example.com'},
     # ...
 ]
 
@@ -91,6 +91,17 @@ def delete_staff(staff_id):
     global staff_data
     staff_data = [staff for staff in staff_data if staff['staff_id'] != staff_id]
     return redirect(url_for('staff_profiles'))
+
+@app.route('/register_staff', methods=['GET', 'POST'])
+def register_staff():
+    if request.method == 'POST':
+        new_staff_id = str(len(staff_data) + 1)
+        new_staff_email = request.form['email']
+        new_staff_name = request.form['name']
+        staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name})
+        return redirect('/staff_profile')
+    return render_template('register_staff.html')
+
 
 # Example orders dictionary (Replace this with your actual order storage)
 orders = {

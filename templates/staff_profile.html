@@ -8,6 +8,7 @@
         <thead>
             <tr>
                 <th>Staff ID</th>
+                <th>Name</th>
                 <th>Email</th>
                 <th>Actions</th>
             </tr>
@@ -16,16 +17,17 @@
             {% for staff in staff_data %}
                 <tr>
                     <td>{{ staff['staff_id'] }}</td>
+                    <td>{{ staff['name'] }}</td>
                     <td>{{ staff['email'] }}</td>
                     <td>
                         <a href="/update_staff/{{ staff['staff_id'] }}">Update</a>
-                        <!-- Add a data-toggle and data-target to trigger the modal -->
                         <a href="#" data-toggle="modal" data-target="#deleteStaffModal_{{ staff['staff_id'] }}">Delete</a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    <a href="/register_staff" class="btn btn-success">Add Staff</a>
 </div>
 
 <!-- Modal for Staff Profile Deletion -->
