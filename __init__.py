@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from Forms import CreateProductForm
+import bcrypt
 import shelve, Product
+import shelve
 
 app = Flask(__name__)
-
+app.secret_key = 'your_secret_key'
 
 @app.route('/')
 def home():
@@ -19,13 +21,50 @@ def home_user():
 def home_admin():
     return render_template('homeAdmin.html')
 
-
-@app.route('/register', methods=['GET'])
+# Open the shelve file in writeback mode for registration
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+        if request.method == 'POST':
+            email = request.form['email']
+            password = request.form['password']
+            postal_code = request.form['postalCode']
+            shipping_address = request.form['shippingAddress']
+            unit_number = request.form['unitNo']
 
+            # Hash the password before storing it
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-@app.route('/userLogin')
+            # Store customer data in a dictionary
+            customer_info = {
+                'email': email,
+                'password': hashed_password,
+                'postal_code': postal_code,
+                'shipping_address': shipping_address,
+                'unit_number': unit_number
+            }
+
+            # Open the shelve file in writeback mode
+            with shelve.open('customer_db', writeback=True) as db:
+                db[email] = customer_info  # Store customer_info in the shelve database with email as key
+
+                print(f"Registered details for {email}: {customer_info}")
+
+            return redirect('/')
+
+        return render_template('register.html')
+
+def show_registered_customers():
+    with shelve.open('customer_db', 'r') as db:
+        with open('registered_customers.txt', 'w') as file:
+            file.write("Registered Customers:\n")
+            for key in db:
+                file.write(f"Customer: {key}")
+                file.write(str(db[key]) + "\n")
+
+# Call this function to display registered customers
+show_registered_customers()
+
+@app.route('/userLogin', methods=['GET', 'POST'])
 def user_login():
     if request.method == 'POST':
         email = request.form['email']
