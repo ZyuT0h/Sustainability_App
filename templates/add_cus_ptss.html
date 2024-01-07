@@ -1,0 +1,17 @@
+<!-- add_cus_ptss.html -->
+<h1>Add New Customer's Points</h1>
+<form method="post" action="{{ url_for('add_cus_ptss') }}">
+    <label for="new_cust_id">Customer ID:</label>
+    <input type="text" id="new_cust_id" name="new_cust_id" required>
+    <br><br>
+    <label for="npc">Points collected:</label>
+    <input type="text" id="npc" name="new_points_collected" required>
+    <br><br>
+    <label for="npr">Points redeemed:</label>
+    <input type="text" id="npr" name="new_points_redeemed" required>
+    <br><br>
+    <label for="npl">Points left:</label>
+    <input type="text" id="npl" name="new_points_left" required>
+    <br><br>
+    <button type="submit">Add New Customer's Points</button>
+</form>

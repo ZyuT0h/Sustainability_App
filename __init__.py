@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from Forms import CreateProductForm
-import shelve, Product
+import Product
 import shelve
 
 
@@ -284,6 +284,84 @@ def admin_forum():
     comments = get_comments()
 
     return render_template('adminForum.html', comments=comments, admin=True)
+
+
+pts = {
+        'customer1': {'points_collected': 100, 'points_redeemed': 50, 'points_left': 50},
+        'customer2': {'points_collected': 150, 'points_redeemed': 30, 'points_left': 120},
+    }
+
+
+@app.route('/pointSystem')
+def point_system():
+    points_data = []
+
+    for cust_id, points_info in pts.items():
+        points_data.append({
+            'cust_id': cust_id,
+            'pts_collected': points_info['points_collected'],
+            'pts_redeemed': points_info['points_redeemed'],
+            'pts_left': points_info['points_left']
+        })
+
+    return render_template('pointSystem.html', pts=points_data)
+
+
+@app.route('/edit_points/<string:cust_id>', methods=['GET', 'POST'])
+def edit_points(cust_id):
+    if request.method == 'GET':
+        # Retrieve customer details based on cust_id and render an edit form
+        # Example: customer = get_customer_details(cust_id)
+        customer_points = pts.get(cust_id, {'points_collected': 0, 'points_redeemed': 0, 'points_left': 0})
+        return render_template('edit_points.html', cust_id=cust_id, customer_points=customer_points)
+    elif request.method == 'POST':
+        # Handle the form submission to update points
+        new_points_collected = int(request.form['new_points_collected'])
+        new_points_redeemed = int(request.form['new_points_redeemed'])
+        new_points_left = int(request.form['new_points_left'])
+
+        # Update the customer points
+        pts[cust_id]['points_collected'] = new_points_collected
+        pts[cust_id]['points_redeemed'] = new_points_redeemed
+        pts[cust_id]['points_left'] = new_points_left
+
+        return redirect(url_for('point_system'))
+
+
+@app.route('/delete_points/<string:cust_id>', methods=['GET', 'POST'])
+def delete_points(cust_id):
+    if request.method == 'GET':
+        # Display the delete confirmation template
+        return render_template('delete_points.html', cust_id=cust_id)
+    elif request.method == 'POST':
+        # Handle the deletion of customer points
+        if cust_id in pts:
+            del pts[cust_id]
+        return redirect(url_for('point_system'))
+
+
+@app.route('/add_cus_ptss', methods=['GET', 'POST'])
+def add_cus_ptss():
+    if request.method == 'POST':
+        # Get the form data
+        new_cust_id = request.form['new_cust_id']
+        new_points_collected = request.form['new_points_collected']
+        new_points_redeemed = request.form['new_points_redeemed']
+        new_points_left = request.form['new_points_left']
+
+        # Perform any necessary logic, such as database operations
+        # For simplicity, let's just print the new customer ID
+        pts[new_cust_id] = {
+            'points_collected': new_points_collected,
+            'points_redeemed': new_points_redeemed,
+            'points_left': new_points_left,
+        }
+
+        # Redirect to a success page or return a response
+        return redirect(url_for('point_system'))
+
+    # If it's a GET request, render the form page
+    return render_template('add_cus_ptss.html')
 
 
 if __name__ == '__main__':
