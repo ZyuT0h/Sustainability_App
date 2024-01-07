@@ -2,9 +2,11 @@
 {% block title %}Point System{% endblock %}
 
 {% block content %}
+
     <h1>Point System</h1>
     <p>Customer ID: {{ customer_points.customer_id }}</p>
     <p>Points Collected: {{ customer_points.points_collected }}</p>
     <p>Points Redeemed: {{ customer_points.points_redeemed }}</p>
     <p>Points Left: {{ customer_points.points_left }}</p>
+
 {% endfor %}
