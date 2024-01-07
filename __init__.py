@@ -286,6 +286,29 @@ def admin_forum():
     return render_template('adminForum.html', comments=comments, admin=True)
 
 
+@app.route('/delete_comment', methods=['POST'])
+def delete_comment():
+    data = request.get_json()
+    comment_index = int(data['comment_index'])
+
+    # Delete the comment with the specified index
+    delete_comment_by_index(comment_index)
+
+    # Respond with the updated comments
+    comments = get_comments()
+    response_data = {'status': 'success', 'comments': comments}
+    return jsonify(response_data)
+
+
+def delete_comment_by_index(index):
+    # Open the shelve file, retrieve existing comments, delete the comment by index, and save it
+    with shelve.open('comments.db') as db:
+        comments = db.get('comments', [])
+        if 0 <= index < len(comments):
+            del comments[index]
+            db['comments'] = comments
+
+
 pts = {
         'customer1': {'points_collected': 100, 'points_redeemed': 50, 'points_left': 50},
         'customer2': {'points_collected': 150, 'points_redeemed': 30, 'points_left': 120},

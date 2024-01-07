@@ -12,20 +12,59 @@
     margin-top: 10px;
     }
 </style>
-    <fieldset>
-        <br>
-        <h1>Forum</h1>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-comment');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentIndex = this.getAttribute('data-index');
+                deleteComment(commentIndex);
+            });
+        });
+
+        function deleteComment(commentIndex) {
+            // Use AJAX to send a request to the server to delete the comment
+            fetch('/delete_comment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ comment_index: commentIndex }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update the comments section with the updated comments
+                    const deletedComment = document.querySelector(`[data-index="${commentIndex}"]`);
+
+                    // Update the content to indicate deletion
+                    if (deletedComment) {
+                        deletedComment.innerHTML = '<em>This comment has been deleted.</em>';
+                    }
+                } else {
+                    console.error('Failed to delete comment');
+                }
+            })
+            .catch(error => {
+                console.error('Error during comment deletion:', error);
+            });
+        }
+    });
+</script>
+<fieldset>
+    <br>
+    <h1>Forum</h1>
     {% if admin %}
         <hr>
-        <div id="commentsList">
-            {% for comment in comments %}
-                {{ comment.username }}:<br>
-                {{ comment.subject }}<br>
-                {{ comment.message }}<br>
-                <input type="text" placeholder="REPLY">
-                <hr>
-            {% endfor %}
-        </div>
-    </fieldset>
+        {% for comment in comments %}
+            {{ comment.username }}:<br>
+            {{ comment.subject }}<br>
+            {{ comment.message }}<br>
+            <input type="text" placeholder="REPLY">
+            <button class="delete-comment" data-index="{{ loop.index - 1 }}">Delete</button>
+            <hr>
+        {% endfor %}
     {% endif %}
+</fieldset>
 {% endblock %}
