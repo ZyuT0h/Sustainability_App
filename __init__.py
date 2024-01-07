@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from Forms import CreateProductForm
-import bcrypt
 import shelve, Product
 import shelve
 
@@ -277,17 +276,6 @@ def save_comment(username, subject, message):
         comments = db.get('comments', [])
         comments.append({'username': username, 'subject': subject, 'message': message})
         db['comments'] = comments
-
-
-@app.route('/pointSystem')
-def point_system(customer_id):
-    customer_points = {
-        'customer_id': customer_id,
-        'points_collected': 100,
-        'points_redeemed': 50,
-        'points_left': 50,
-    }
-    return render_template('pointSystem.html', customer_points=customer_points)
 
 
 @app.route('/adminForum')
