@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from Forms import CreateProductForm
+from datetime import datetime, timedelta
+import re
 import Product
 import shelve
 import bcrypt
@@ -76,7 +78,6 @@ def user_login():
             return 'Login Failed. Invalid credentials.'
     return render_template('userLogin.html')
 
-
 @app.route('/adminLogin', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -91,12 +92,83 @@ def admin_login():
                                                              stored_hashed_password.encode('utf-8')):
                     # Passwords match - log the staff in
                     session['email'] = entered_email
+
+                    # Get the last password change date for the logged-in staff
+                    last_password_change_date = staff.get('last_password_change_date', None)
+
+                    # Check if last_password_change_date exists and compare the dates
+                    if last_password_change_date:
+                        last_password_change_date = datetime.strptime(last_password_change_date, '%Y-%m-%d')
+                        if (datetime.now() - last_password_change_date) > timedelta(days=90):
+                            flash('You must change your password for security reasons.')
+                            return redirect('/change_password')
+
+                    # Successful login, redirect to staff profile
                     return redirect('/staff_profile')
 
         # Incorrect email or password - redirect back to login page
         flash('Invalid email or password')
         return redirect('/adminLogin')
+
     return render_template('adminLogin.html')
+
+# Route for staff to change their password
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_new_password = request.form['confirm_new_password']
+
+        # Retrieve the logged-in staff's email from the session
+        logged_in_email = session.get('email')
+
+        staff_data = get_staff_data()
+        for staff in staff_data:
+            if staff['email'] == logged_in_email:
+                stored_hashed_password = staff.get('password', None)
+                if stored_hashed_password and bcrypt.checkpw(current_password.encode('utf-8'),
+                                                             stored_hashed_password.encode('utf-8')):
+                    # Current password matches - update the password
+                    if new_password == confirm_new_password:
+                        # Check new password meets requirements
+                        if len(new_password) < 8:
+                            flash('Password must be at least 8 characters long.')
+                            return redirect('/change_password')
+                        elif not re.search(r'[A-Z]', new_password):
+                            flash('Password must contain at least one uppercase letter.')
+                            return redirect('/change_password')
+                        elif not re.search(r'[a-z]', new_password):
+                            flash('Password must contain at least one lowercase letter.')
+                            return redirect('/change_password')
+                        elif not re.search(r'[0-9]', new_password):
+                            flash('Password must contain at least one digit.')
+                            return redirect('/change_password')
+                        elif not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password):
+                            flash('Password must contain at least one special character.')
+                            return redirect('/change_password')
+
+                        # Hash the new password before storing it
+                        hashed_new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode(
+                            'utf-8')
+                        staff['password'] = hashed_new_password
+
+                        # Update last_password_change_date to the current date
+                        staff['last_password_change_date'] = datetime.now()
+
+                        # Update staff_data in the database
+                        with open_staff_db() as db:
+                            db['staff_data'] = staff_data
+                        flash('Password changed successfully!')
+                        return redirect('/staff_profile')
+                    else:
+                        flash('New passwords do not match. Please try again.')
+                        return redirect('/change_password')
+                else:
+                    flash('Incorrect current password.', 'error')
+                    return redirect('/change_password')
+
+    return render_template('change_password.html')
 
 
 @app.route('/shop')

@@ -3,25 +3,21 @@
 
 {% block content %}
 <h1 class="display-4">Login as admin</h1>
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <div class="alert alert-danger" role="alert">
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-{% endwith %}
-
 <form action="/adminLogin" method="post" id="loginForm">
         <label for="staff_email">Staff Email:</label><br>
         <input type="email" id="staff_email" name="email" required><br><br>
 
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password" required><br><br>
+
+        <!-- Flash message for incorrect password (if needed) -->
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
 
         <button type="submit" class="btn btn-warning">LOGIN</button>
 </form>
