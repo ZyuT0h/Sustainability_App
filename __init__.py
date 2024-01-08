@@ -91,17 +91,16 @@ def shop():
 def cart():
     return render_template('cart.html')
 
-import shelve
-
 # Open the shelve file for staff profiles
+# Function to open the shelve file for staff profiles
 def open_staff_db():
     return shelve.open('staff_db')
 
-# Retrieve staff data from shelve file
+# Retrieve staff data from the shelve file
 def get_staff_data():
     with open_staff_db() as db:
         if 'staff_data' not in db:
-            db['staff_data'] = []
+            db['staff_data'] = []  # Initialize staff_data if not present in the shelve file
         return db['staff_data']
 
 # Display staff profiles
@@ -115,14 +114,16 @@ def staff_profiles():
 def update_staff(staff_id):
     if request.method == 'POST':
         update_staff_email = request.form['updateStaffEmail']
+        update_staff_name = request.form['updateStaffName']
         staff_data = get_staff_data()
         for staff in staff_data:
             if staff['staff_id'] == staff_id:
                 staff['email'] = update_staff_email
+                staff['name'] = update_staff_name
                 with open_staff_db() as db:
-                    db['staff_data'] = staff_data
+                    db['staff_data'] = staff_data  # Update the staff data in the shelve file
                 break
-        return redirect('/staff_profile')
+        return redirect('/staff_profile')  # Redirect to staff profile page after successful update
     return render_template('update_staff_profile.html', staff_id=staff_id)
 
 # Delete staff profile
@@ -140,9 +141,11 @@ def register_staff():
     if request.method == 'POST':
         new_staff_email = request.form['email']
         new_staff_name = request.form['name']
+        new_staff_phone = request.form['phone']
         staff_data = get_staff_data()
         new_staff_id = str(len(staff_data) + 1)
-        staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name})
+        staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name, 'phone': new_staff_phone})
+
         with open_staff_db() as db:
             db['staff_data'] = staff_data
         return redirect('/staff_profile')
