@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from Forms import CreateProductForm
 import Product
 import shelve
-# import bcrypt
+import bcrypt
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'something'
 
 @app.route('/')
 def home():
@@ -77,8 +77,25 @@ def user_login():
     return render_template('userLogin.html')
 
 
-@app.route('/adminLogin')
+@app.route('/adminLogin', methods=['GET', 'POST'])
 def admin_login():
+    if request.method == 'POST':
+        entered_email = request.form['email']
+        entered_password = request.form['password']
+
+        staff_data = get_staff_data()
+        for staff in staff_data:
+            if staff['email'] == entered_email:
+                stored_hashed_password = staff.get('password', None)
+                if stored_hashed_password and bcrypt.checkpw(entered_password.encode('utf-8'),
+                                                             stored_hashed_password.encode('utf-8')):
+                    # Passwords match - log the staff in
+                    session['email'] = entered_email
+                    return redirect('/staff_profile')
+
+        # Incorrect email or password - redirect back to login page
+        flash('Invalid email or password')
+        return redirect('/adminLogin')
     return render_template('adminLogin.html')
 
 
@@ -92,7 +109,6 @@ def cart():
     return render_template('cart.html')
 
 # Open the shelve file for staff profiles
-# Function to open the shelve file for staff profiles
 def open_staff_db():
     return shelve.open('staff_db')
 
@@ -137,6 +153,7 @@ def delete_staff(staff_id):
         db['staff_data'] = staff_data
     return redirect('/staff_profile')
 
+
 # Register new staff profile
 @app.route('/register_staff', methods=['GET', 'POST'])
 def register_staff():
@@ -146,12 +163,24 @@ def register_staff():
         new_staff_phone = request.form['phone']
         staff_data = get_staff_data()
         new_staff_id = str(len(staff_data) + 1)
-        staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name,
-                           'phone': new_staff_phone})
+
+        # Hashing the default password (e.g., 'password123')
+        default_password = 'password123'
+        hashed_password = bcrypt.hashpw(default_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        staff_data.append({
+            'staff_id': new_staff_id,
+            'email': new_staff_email,
+            'name': new_staff_name,
+            'phone': new_staff_phone,
+            'password': hashed_password  # Storing hashed password
+        })
 
         with open_staff_db() as db:
             db['staff_data'] = staff_data
-        return redirect('/staff_profile')
+
+        return redirect('/staff_profile')  # Redirect to staff profile page after successful registration
+
     return render_template('register_staff.html')
 
 
