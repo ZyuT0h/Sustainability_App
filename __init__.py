@@ -91,53 +91,60 @@ def shop():
 def cart():
     return render_template('cart.html')
 
-staff_data = [
-    {'staff_id': '1', 'name': 'John Doe', 'email': 'staff1@example.com'},
-    {'staff_id': '2', 'name': 'Jane Smith', 'email': 'staff2@example.com'},
-    # ...
-]
+import shelve
 
+# Open the shelve file for staff profiles
+def open_staff_db():
+    return shelve.open('staff_db')
+
+# Retrieve staff data from shelve file
+def get_staff_data():
+    with open_staff_db() as db:
+        if 'staff_data' not in db:
+            db['staff_data'] = []
+        return db['staff_data']
+
+# Display staff profiles
 @app.route('/staff_profile')
 def staff_profiles():
+    staff_data = get_staff_data()
     return render_template('staff_profile.html', staff_data=staff_data)
 
+# Update staff profile
 @app.route('/update_staff/<staff_id>', methods=['GET', 'POST'])
 def update_staff(staff_id):
     if request.method == 'POST':
         update_staff_email = request.form['updateStaffEmail']
-        # Update staff email in staff_data
+        staff_data = get_staff_data()
         for staff in staff_data:
             if staff['staff_id'] == staff_id:
                 staff['email'] = update_staff_email
-        return redirect('/staff_profiles')
+                with open_staff_db() as db:
+                    db['staff_data'] = staff_data
+                break
+        return redirect('/staff_profile')
     return render_template('update_staff_profile.html', staff_id=staff_id)
 
-@app.route('/update_staff_profile/<staff_id>', methods=['POST'])
-def update_staff_profile(staff_id):
-    update_staff_email = request.form['updateStaffEmail']
-
-    # Find the staff member in staff_data and update the email
-    for staff in staff_data:
-        if staff['staff_id'] == staff_id:
-            staff['email'] = update_staff_email
-            break
-
-    return redirect('/staff_profile')
-
+# Delete staff profile
 @app.route('/delete_staff/<staff_id>')
 def delete_staff(staff_id):
-    # Delete staff profile from staff_data
-    global staff_data
+    staff_data = get_staff_data()
     staff_data = [staff for staff in staff_data if staff['staff_id'] != staff_id]
-    return redirect(url_for('staff_profiles'))
+    with open_staff_db() as db:
+        db['staff_data'] = staff_data
+    return redirect('/staff_profile')
 
+# Register new staff profile
 @app.route('/register_staff', methods=['GET', 'POST'])
 def register_staff():
     if request.method == 'POST':
-        new_staff_id = str(len(staff_data) + 1)
         new_staff_email = request.form['email']
         new_staff_name = request.form['name']
+        staff_data = get_staff_data()
+        new_staff_id = str(len(staff_data) + 1)
         staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name})
+        with open_staff_db() as db:
+            db['staff_data'] = staff_data
         return redirect('/staff_profile')
     return render_template('register_staff.html')
 
