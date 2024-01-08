@@ -115,11 +115,13 @@ def update_staff(staff_id):
     if request.method == 'POST':
         update_staff_email = request.form['updateStaffEmail']
         update_staff_name = request.form['updateStaffName']
+        update_staff_phone = request.form['updateStaffPhone']
         staff_data = get_staff_data()
         for staff in staff_data:
             if staff['staff_id'] == staff_id:
                 staff['email'] = update_staff_email
                 staff['name'] = update_staff_name
+                staff['phone'] = update_staff_phone
                 with open_staff_db() as db:
                     db['staff_data'] = staff_data  # Update the staff data in the shelve file
                 break
@@ -144,7 +146,8 @@ def register_staff():
         new_staff_phone = request.form['phone']
         staff_data = get_staff_data()
         new_staff_id = str(len(staff_data) + 1)
-        staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name, 'phone': new_staff_phone})
+        staff_data.append({'staff_id': new_staff_id, 'email': new_staff_email, 'name': new_staff_name,
+                           'phone': new_staff_phone})
 
         with open_staff_db() as db:
             db['staff_data'] = staff_data

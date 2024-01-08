@@ -10,6 +10,7 @@
                 <th>Staff ID</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Phone Number</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -19,6 +20,7 @@
                     <td>{{ staff['staff_id'] }}</td>
                     <td>{{ staff['name'] }}</td>
                     <td>{{ staff['email'] }}</td>
+                    <td>{{ staff['phone'] }}</td>
                     <td>
                         <a href="/update_staff/{{ staff['staff_id'] }}">Update</a>
                         <a href="#" data-toggle="modal" data-target="#deleteStaffModal_{{ staff['staff_id'] }}">Delete</a>
