@@ -116,7 +116,7 @@ def admin_login():
             return redirect('/adminLogin')
 
     return render_template('adminLogin.html')
-
+aa
 # Route for staff to change their password
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
