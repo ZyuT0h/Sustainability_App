@@ -116,8 +116,7 @@ def admin_login():
             return redirect('/adminLogin')
 
     return render_template('adminLogin.html')
-aadocument.getElementById("confirm-password-requirements").style.display = "none";
-            document.getElementById("confirm-password-valid").style.display = "block";
+
 # Route for staff to change their password
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
