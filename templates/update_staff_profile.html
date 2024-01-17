@@ -14,6 +14,15 @@
         <label for="updateStaffPhone">Update Staff Phone Number:</label>
         <input type="tel" id="updateStaffPhone" name="updateStaffPhone" required>
 
+        <label for="updateStaffRole">Role:</label>
+        <select id="updateStaffRole" name="updateStaffRole">
+            <option value="admin" {% if staff['role'] == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="manager" {% if staff['role'] == 'manager' %}selected{% endif %}>Manager</option>
+            <option value="staff" {% if staff['role'] == 'staff' %}selected{% endif %}>Staff</option>
+            <option value="supervisor" {% if staff['role'] == 'supervisor' %}selected{% endif %}>Supervisor</option>
+        </select>
+
+
         <button type="submit">Update</button>
     </form>
 </div>

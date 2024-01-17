@@ -225,21 +225,33 @@ def staff_profiles():
 # Update staff profile
 @app.route('/update_staff/<staff_id>', methods=['GET', 'POST'])
 def update_staff(staff_id):
-    if request.method == 'POST':
-        update_staff_email = request.form['updateStaffEmail']
-        update_staff_name = request.form['updateStaffName']
-        update_staff_phone = request.form['updateStaffPhone']
+        if request.method == 'POST':
+            update_staff_email = request.form['updateStaffEmail']
+            update_staff_name = request.form['updateStaffName']
+            update_staff_phone = request.form['updateStaffPhone']
+            update_staff_role = request.form['updateStaffRole']
+            staff_data = get_staff_data()
+            for staff in staff_data:
+                if staff['staff_id'] == staff_id:
+                    staff['email'] = update_staff_email
+                    staff['name'] = update_staff_name
+                    staff['phone'] = update_staff_phone
+                    staff['role'] = update_staff_role
+                    with open_staff_db() as db:
+                        db['staff_data'] = staff_data  # Update the staff data in the shelve file
+                    break
+            return redirect('/staff_profile')  # Redirect to staff profile page after successful update
+
+        # Fetch staff data for the specified staff_id
         staff_data = get_staff_data()
-        for staff in staff_data:
-            if staff['staff_id'] == staff_id:
-                staff['email'] = update_staff_email
-                staff['name'] = update_staff_name
-                staff['phone'] = update_staff_phone
-                with open_staff_db() as db:
-                    db['staff_data'] = staff_data  # Update the staff data in the shelve file
-                break
-        return redirect('/staff_profile')  # Redirect to staff profile page after successful update
-    return render_template('update_staff_profile.html', staff_id=staff_id)
+        staff = next((s for s in staff_data if s['staff_id'] == staff_id), None)
+
+        if staff:
+            return render_template('update_staff_profile.html', staff=staff, staff_id=staff_id)
+        else:
+            # Handle the case where staff with the given ID is not found
+            flash("Staff not found", "error")
+            return redirect('/staff_profile')
 
 # Delete staff profile
 @app.route('/delete_staff/<staff_id>')
@@ -258,6 +270,8 @@ def register_staff():
         new_staff_email = request.form['email']
         new_staff_name = request.form['name']
         new_staff_phone = request.form['phone']
+        new_staff_role = request.form['role']
+
         staff_data = get_staff_data()
         new_staff_id = str(len(staff_data) + 1)
 
@@ -270,7 +284,8 @@ def register_staff():
             'email': new_staff_email,
             'name': new_staff_name,
             'phone': new_staff_phone,
-            'password': hashed_password  # Storing hashed password
+            'role': new_staff_role,
+            'password': hashed_password # Storing hashed password
         })
 
         with open_staff_db() as db:
