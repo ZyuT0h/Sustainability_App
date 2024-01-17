@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from Forms import CreateProductForm
 from datetime import datetime, timedelta
+import random
 import re
 import Product
 import shelve
@@ -273,7 +274,14 @@ def register_staff():
         new_staff_role = request.form['role']
 
         staff_data = get_staff_data()
-        new_staff_id = str(len(staff_data) + 1)
+
+
+        # Generate a unique staff ID based on the first few characters of the name and a random number
+        new_staff_id = f"{new_staff_name[:3]}{random.randint(100, 999)}"
+
+        # Check if the generated ID is already in use
+        while any(staff['staff_id'] == new_staff_id for staff in staff_data):
+            new_staff_id = f"{new_staff_name[:3]}{random.randint(100, 999)}"
 
         # Hashing the default password (e.g., 'password123')
         default_password = 'password123'
