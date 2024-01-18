@@ -90,6 +90,13 @@
             var staffId = dropdown.getAttribute('data-staff-id');
             if (staffId !== staffIdBeingUpdated) {
                 dropdown.disabled = true;
+            } else {
+                dropdown.addEventListener('change', function() {
+                    // Enable other dropdowns when the selected one changes
+                    dropdowns.forEach(function(otherDropdown) {
+                        otherDropdown.disabled = (otherDropdown !== dropdown);
+                    });
+                });
             }
         });
     });
