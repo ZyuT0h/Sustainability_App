@@ -198,11 +198,21 @@ def check_current_password():
     return jsonify(success=False)
 @app.route('/shop')
 def shop():
-    return render_template('shop.html')
+    products_dict = {}
+    db = shelve.open('product.db', 'r')
+    products_dict = db['Products']
+    db.close()
+
+    products_list = []
+    for key in products_dict:
+        product = products_dict.get(key)
+        products_list.append(product)
+    return render_template('shop.html', products_list=products_list)
 
 
 @app.route('/cart')
 def cart():
+
     return render_template('cart.html')
 
 # Open the shelve file for staff profiles
