@@ -20,7 +20,7 @@ class Product:
         Product.count_id += 1
         self.__product_id = Product.count_id
         self.__product_name = product_name
-        # self.__product_image = product_image
+        self.__product_image = product_image
         self.__category = category
         self.__stock = stock
         self.__price = price
@@ -32,8 +32,8 @@ class Product:
     def set_product_name(self, product_name):
         self.__product_name = product_name
         
-    # def set_product_image(self, product_image):
-    #     self.__product_image = product_image
+    def set_product_image(self, product_image):
+        self.__product_image = product_image
 
     def set_category(self, category):
         self.__category = category
@@ -52,9 +52,9 @@ class Product:
 
     def get_product_name(self):
         return self.__product_name
-    
-    # def get_product_image(self):
-    #     return self.__product_image
+
+    def get_product_image(self):
+        return self.__product_image
 
     def get_category(self):
         return self.__category

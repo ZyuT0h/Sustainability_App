@@ -2,7 +2,39 @@
 {% block title %}Library Loan System - Home{% endblock %}
 
 {% block content %}
-
-  <h1>Shop heffffreeeeeee</h1>
-
+<style>
+    .container {width:85%; float: right; border: 1px red solid;
+    }
+    tr {border: 1px red solid;
+    }
+    td {border: 1px red solid;
+    }
+</style>
+<h1 class="display-4">Shop</h1>
+<div class="container">
+    <table class="table table-borderless">
+        {% for product in products_list %}
+        <div class="row">
+    	    <div class="col-sm">
+                {{ product.get_product_name() }}
+            </div>
+  	    </div>
+  	    <div class="row">
+    	    <div class="col-sm">
+                {{ product.get_description() }}
+            </div>
+  	    </div>
+        <div class="row">
+    	    <div class="col-sm">
+                {{ product.get_price() }}
+            </div>
+  	    </div>
+        <div class="row">
+    	    <div class="col-sm">
+                <a href="/updateProduct/{{product.get_product_id()}}" class="btn btn-warning">Update</a>
+            </div>
+  	    </div>
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}
