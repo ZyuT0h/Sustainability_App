@@ -1,0 +1,28 @@
+<!-- report.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.month }} Report</title>
+</head>
+<body>
+    <h1>{{ report.month }} Report</h1>
+    <h2>Sales Data:</h2>
+    <ul>
+        {% for product, quantity in report.sales.items() %}
+            <li>{{ product }}: {{ quantity }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Most Profitable Product: {{ report.most_profitable_product }}</h2>
+    <h2>Donation Data:</h2>
+    <ul>
+        {% for donation, amount in report.donations.items() %}
+            <li>{{ donation }}: {{ amount }}</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Include the chart -->
+    {% include 'chart.html' %}
+</body>
+</html>

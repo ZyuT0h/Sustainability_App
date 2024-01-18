@@ -5,6 +5,17 @@
 {% block content %}
 <div class="container">
     <h1>Register New Staff</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST" action="/register_staff">
         <div class="form-group">
             <label for="email">Email:</label>
@@ -16,7 +27,7 @@
         </div>
         <div class="form-group">
             <label for="phone">Phone number:</label>
-            <input type="tel" class="form-control" id="phone" name="phone" required>
+            <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{8}" required>
         </div>
 
         <label for="newStaffRole">Role:</label>

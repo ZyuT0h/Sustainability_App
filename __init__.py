@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from Forms import CreateProductForm
 from datetime import datetime, timedelta
+from report import MonthlyReport, get_report_data, save_report, load_report
 import random
 import re
 import Product
@@ -14,11 +15,9 @@ app.secret_key = 'something'
 def home():
     return render_template('home.html')
 
-
 @app.route('/homeUser')
 def home_user():
     return render_template('homeUser.html')
-
 
 @app.route('/homeAdmin')
 def home_admin():
@@ -226,33 +225,41 @@ def staff_profiles():
 # Update staff profile
 @app.route('/update_staff/<staff_id>', methods=['GET', 'POST'])
 def update_staff(staff_id):
-        if request.method == 'POST':
+    staff_data = get_staff_data()
+    staff = next((s for s in staff_data if s['staff_id'] == staff_id), None)
+
+    if request.method == 'POST':
+        # Fetch the existing staff data for display
+        existing_staff_data = get_staff_data()
+
+        if staff:
             update_staff_email = request.form['updateStaffEmail']
             update_staff_name = request.form['updateStaffName']
             update_staff_phone = request.form['updateStaffPhone']
             update_staff_role = request.form['updateStaffRole']
-            staff_data = get_staff_data()
-            for staff in staff_data:
-                if staff['staff_id'] == staff_id:
-                    staff['email'] = update_staff_email
-                    staff['name'] = update_staff_name
-                    staff['phone'] = update_staff_phone
-                    staff['role'] = update_staff_role
-                    with open_staff_db() as db:
-                        db['staff_data'] = staff_data  # Update the staff data in the shelve file
-                    break
+
+            # Check if the email is already registered (excluding the current staff being updated)
+            if any(s['email'] == update_staff_email and s['staff_id'] != staff_id for s in staff_data):
+                flash("Email address is already registered.", "error")
+                return render_template('update_staff_profile.html', staff=staff, staff_id=staff_id)
+
+            staff['email'] = update_staff_email
+            staff['name'] = update_staff_name
+            staff['phone'] = update_staff_phone
+            staff['role'] = update_staff_role
+
+            with open_staff_db() as db:
+                db['staff_data'] = staff_data  # Update the staff data in the shelve file
+
             return redirect('/staff_profile')  # Redirect to staff profile page after successful update
 
-        # Fetch staff data for the specified staff_id
-        staff_data = get_staff_data()
-        staff = next((s for s in staff_data if s['staff_id'] == staff_id), None)
-
-        if staff:
-            return render_template('update_staff_profile.html', staff=staff, staff_id=staff_id)
-        else:
-            # Handle the case where staff with the given ID is not found
-            flash("Staff not found", "error")
-            return redirect('/staff_profile')
+    # Fetch staff data for the specified staff_id
+    if staff:
+        return render_template('update_staff_profile.html', staff=staff, staff_id=staff_id)
+    else:
+        # Handle the case where staff with the given ID is not found
+        flash("Staff not found", "error")
+        return redirect('/staff_profile')
 
 # Delete staff profile
 @app.route('/delete_staff/<staff_id>')
@@ -275,6 +282,10 @@ def register_staff():
 
         staff_data = get_staff_data()
 
+        # Check if the email is already registered
+        if any(staff['email'] == new_staff_email for staff in staff_data):
+            flash("Email address is already registered.", "error")
+            return render_template('register_staff.html')
 
         # Generate a unique staff ID based on the first few characters of the name and a random number
         new_staff_id = f"{new_staff_name[:3]}{random.randint(100, 999)}"
@@ -325,6 +336,28 @@ def order_details():
 
     return render_template('order_details.html', orders=order_data)
 
+@app.route('/generate_report/<month>')
+def generate_report(month):
+    report = get_report_data(month)
+    save_report(month, report)
+    return render_template('report.html', report=report)
+
+@app.route('/view_report/<month>')
+def view_report(month):
+    report = load_report(month)
+    return render_template('report.html', report=report)
+
+@app.route('/report')
+def report():
+    # Replace this with your actual logic for generating the report
+    report_data = {
+        'month': 'January',
+        'sales': {'Product A': 100, 'Product B': 150, 'Product C': 80},
+        'most_profitable_product': 'Product B',
+        'donations': {'Donation A': 200, 'Donation B': 300, 'Donation C': 150}
+    }
+
+    return render_template('report.html', report=report_data)
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
@@ -346,7 +379,6 @@ def add_product():
         db.close()
         return redirect(url_for('manage_inventory'))
     return render_template('addProduct.html', form=create_product_form)
-
 
 @app.route('/manageInventory')
 def manage_inventory():
