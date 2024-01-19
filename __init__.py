@@ -136,6 +136,7 @@ def change_password():
 
                 if password_changed:
                     # Password has already been changed, redirect to staff profile or other page
+                    flash('Password has already been changed.', 'error')
                     return redirect('/staff_profile')
 
                 # If the password hasn't been changed, verify the current password
@@ -173,7 +174,6 @@ def change_password():
                 else:
                     flash('Incorrect current password.', 'error')
                     return redirect('/change_password')
-
     return render_template('change_password.html')
 
 @app.route('/check_current_password', methods=['POST'])
