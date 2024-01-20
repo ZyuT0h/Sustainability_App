@@ -3,9 +3,9 @@
 
 {% block content %}
 <style>
-    .container {width:15%; float: left; border: 4px green solid;
+    .container {width:10%; float: left; border: 4px green solid;
     }
-    .container2 {width:85%; float: right; border: 4px green solid;
+    .container2 {width:89%; float: right; border: 4px green solid;
     }
     div {border: 0px red solid;
     }
@@ -13,7 +13,7 @@
 <h1>Shop</h1>
 <div class="container">
     <div class="category">
-        <h2>Categories</h2>
+        <h5>Categories</h5>
         <a href=""></a>
         <a href=""></a>
         <a href=""></a>
@@ -21,7 +21,6 @@
 </div>
 <div class="container2">
     <div class="item">
-        <h2>Products</h2>
         {% for product in products_list %}
         <div class="row">
     	    <div class="col-sm">
