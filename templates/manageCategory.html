@@ -1,0 +1,77 @@
+{% extends "base/base_admin.html" %}
+{% block title %}Inventory Management{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Inventory Management</h1>
+<div>
+ {% if count == 0 %}
+ <p>There are no category.</p>
+ {% elif count == 1 %}
+ <p>There is 1 category.</p>
+ {% else %}
+ <p>There are {{ count }} category.</p>
+ {% endif %}
+</div>
+<div>
+    <table class="table table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>Category Name</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </theadtable-striped>
+        <tbody>
+        {% for category in categories_list %}
+        <tr>
+            <td>{{ category }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+                <td>
+                    <form action="{{url_for('delete_category', category=category)}}" method="POST">
+                        <!-- Button to Open the Modal -->
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{ category|replace(' ', '_') | safe }}">
+                            Delete
+                        </button>
+                        <!-- The Modal -->
+                        <div class="modal" id="myModal_{{ category|replace(' ', '_') | safe }}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Delete Confirmation</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                        Are you sure you want to delete {{ category }}?
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <input type="submit" value="Delete" class="btn btn-danger">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

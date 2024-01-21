@@ -34,7 +34,7 @@
             <td>{{ product.get_product_name() }}</td>
             <td>
                 {% if product.get_product_image() %}
-                <img src="{{ url_for('static', filename='product_images/' + product.get_product_image()) }}" alt="{{ product.get_product_name() }} Image" style="max-width: 50px; max-height: 50px;">
+                <img src="{{ url_for('static', filename='product_images/' + product.get_product_image()) }}" style="max-width: 60px; max-height: 60px;">
                 {% else %}
                 No Image
                 {% endif %}

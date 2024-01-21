@@ -395,7 +395,7 @@ def report():
 
 
 # Set the upload folder outside of the route function
-app.config['UPLOAD_FOLDER'] = 'product_images'
+# app.config['UPLOAD_FOLDER'] = 'product_images'
 
 
 @app.route('/addProduct', methods=['GET', 'POST'])
@@ -415,7 +415,7 @@ def add_product():
             if file.filename != '':
                 # Save the file with a secure filename
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join('static', 'product_images', filename))
                 product.set_product_image(filename)
 
         products_dict = {}
@@ -478,9 +478,14 @@ def update_product(id):
         if 'productImage' in request.files:
             file = request.files['productImage']
             if file.filename != '':
-                # Save the file with a secure filename
+                # Delete the old image file
+                old_image_path = os.path.join('static', 'product_images', product.get_product_image())
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+
+                # Save the new file with a secure filename
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join('static', 'product_images', filename))
                 product.set_product_image(filename)
 
         db['Products'] = products_dict

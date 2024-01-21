@@ -5,28 +5,57 @@
 {% from "includes/_formHelper.html" import render_field %}
 
 <style>
-
+    <style>
+    .display-4 {display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    }
+    form {
+    width: 70%;
+    margin: 0 auto;
+    }
+    label {font-size: 22px;
+    }
+    form input, form select, form textarea {
+    width: 100%;
+    height: 20%;
+    box-sizing: border-box;
+    }
 </style>
-
-<h1 class="display-4">Update Product Details</h1>
 <form action="" method="POST">
-    <label for="productName">Product name:</label><br>
-    <input type="text" id="productName" name="productName" value="{{ product_name_data }}" required><br>
-    <label for="productImage">Product Image:</label><br>
-    <input type= "file" id="productImage" name="productImage" value="{[ product_image_data }}"><br>
-    <label for="category">Category:</label>
-    <select id="category" name="category">
-        <option value="Coaster" {% if category_data == 'Coaster' %}selected{% endif %}>Coaster</option>
-        <option value="Pouch" {% if category_data == 'Pouch' %}selected{% endif %}>Pouch</option>
-        <option value="Tote bag" {% if category_data == 'Tote bag' %}selected{% endif %}>Tote bag</option>
-    </select>
-    <label for="price">Price:</label><br>
-    <input type="text" id="price" name="price" value="{{ price_data }}"><br>
-    <label for="stock">Stock:</label><br>
-    <input type="number" id="stock" name="stock" value="{{ stock_data }}"><br>
-    <textarea name="description" rows="10" cols="30">
-        {{ description_data }}
-    </textarea>
-    <input type="submit" value="Submit" class="btn btn-primary"/>
+    <div class="container mt-2  ">
+        <h3 class="display-4">Update Product Details</h3>
+        <div class="mb-3 form-control">
+            <label for="productName">Product name:</label><br>
+            <input type="text" id="productName" name="productName" value="{{ product_name_data }}" required><br>
+        </div>
+        <div class="mb-3 form-control">
+            <label for="productImage">Product Image:</label><br>
+            <input type= "file" id="productImage" name="productImage" value="{[ product_image_data }}"><br>
+        </div>
+        <div class="mb-3 form-control">
+            <label for="category">Category:</label>
+            <select id="category" name="category">
+                <option value="Coaster" {% if category_data == 'Coaster' %}selected{% endif %}>Coaster</option>
+                <option value="Pouch" {% if category_data == 'Pouch' %}selected{% endif %}>Pouch</option>
+                <option value="Tote bag" {% if category_data == 'Tote bag' %}selected{% endif %}>Tote bag</option>
+            </select>
+        </div>
+        <div class="mb-3 form-control">
+            <label for="price">Price:</label><br>
+            <input type="text" id="price" name="price" value="{{ price_data }}"><br>
+        </div>
+        <div class="mb-3 form-control">
+            <label for="stock">Stock:</label><br>
+            <input type="number" id="stock" name="stock" value="{{ stock_data }}"><br>
+        </div>
+        <div class="mb-3 form-control">
+            <textarea name="description" rows="10" cols="30">{{ description_data }}</textarea>
+        </div>
+        <div class="mb-3 form-control">
+            <input type="submit" value="Submit" class="btn btn-primary"/>
+        </div>
+    </div>
 </form>
 {% endblock %}
