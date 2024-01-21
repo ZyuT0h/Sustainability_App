@@ -212,26 +212,6 @@ def check_current_password():
     return jsonify(success=False)
 
 
-@app.route('/shop')
-def shop():
-    products_dict = {}
-    db = shelve.open('product.db', 'r')
-    products_dict = db['Products']
-    db.close()
-
-    products_list = []
-    for key in products_dict:
-        product = products_dict.get(key)
-        products_list.append(product)
-    return render_template('shop.html', products_list=products_list)
-
-
-@app.route('/cart')
-def cart():
-
-    return render_template('cart.html')
-
-
 # Open the shelve file for staff profiles
 def open_staff_db():
     return shelve.open('staff_db')
@@ -397,6 +377,86 @@ def report():
 # Set the upload folder outside of the route function
 # app.config['UPLOAD_FOLDER'] = 'product_images'
 
+@app.route('/shop')
+def shop():
+    products_dict = {}
+    db = shelve.open('product.db', 'r')
+    products_dict = db['Products']
+    db.close()
+
+    products_list = []
+    for key in products_dict:
+        product = products_dict.get(key)
+        products_list.append(product)
+    return render_template('shop.html', products_list=products_list)
+
+
+@app.route('/cart')
+def cart():
+
+    return render_template('cart.html')
+
+
+@app.route('/add_to_cart/<int:id>', methods=['POST'])
+def add_to_cart(id):
+    products_dict = {}
+    db = shelve.open('product.db', 'r')
+    products_dict = db['Products']
+    db.close()  # Close the shelve database
+
+    product = products_dict.get(id)
+
+    # Get the current cart from the session or create an empty cart
+    cart = session.get('cart', {})
+
+    if product:
+        # Add the product to the cart or update the quantity if it's already in the cart
+        if id in cart:
+            cart[id]['quantity'] += 1
+        else:
+            cart[id] = {
+                'product_id': id,
+                'product_name': product.product_name,
+                'price': product.price,
+                'quantity': 1
+            }
+
+        # Update the cart in the session
+        session['cart'] = cart
+
+        return redirect(url_for('shop'))  # Corrected this line
+    else:
+        return 'Product not found'
+
+@app.route('/set_session/<int:id>')
+def set_session(id):
+    products_dict = {}
+    db = shelve.open('product.db', 'r')
+    products_dict = db['Products']
+
+    cart = session.get('cart', {})
+    product = products_dict.get(id)
+    if product:
+        cart[id] = {
+            'product_id': id,
+            'product_name': product.get('product_name'),
+            'price': product.get('price'),
+            'quantity': 1
+        }
+        session['cart'] = cart  # Corrected this line
+        db.close
+        return f'Session set successfully for product ID {id}'
+    else:
+        return f'Product with ID {id} not found'
+
+@app.route('/get_session')
+def get_session():
+    if 'cart' in session:
+        cart = session['cart']
+        return f'The value in session is: {cart}'
+    else:
+        return 'No value in session'
+
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
@@ -445,18 +505,6 @@ def manage_inventory():
         products_list.append(product)
 
     return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
-
-'''
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' in request.files:
-        file = request.files['file']
-        filename = secure_filename(file.filename)
-        # Here you should save the file
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return 'File uploaded successfully'
-    return 'No file uploaded'
-'''
 
 
 @app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
