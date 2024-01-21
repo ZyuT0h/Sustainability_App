@@ -1,44 +1,91 @@
-<!-- register_staff.html -->
 {% extends "/base/base_admin.html" %}
 {% block title %}Register Staff{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Register New Staff</h1>
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    form {
+        width: 70%;
+        margin: 0 auto;
+    }
 
-    <form method="POST" action="/register_staff">
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" class="form-control" id="email" name="email" required>
+    label {
+        font-size: 22px;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        width: 100%;
+        height: 40px; /* Adjusted height for better visibility */
+        box-sizing: border-box;
+        margin-bottom: 10px; /* Added margin for spacing between fields */
+    }
+
+    .btn-primary {
+        /* Customize button color to match your design */
+        background-color: #007bff;
+        border-color: #007bff;
+        width: 100%;
+    }
+
+    .display-4 {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    margin-top: -120px;
+
+</style>
+
+<form method="POST" action="/register_staff">
+    <div class="container">
+        <div class="col-md-6">
+            <h1 class="display-4 text-center">Register New Staff</h1>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone number:</label>
+                <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{8}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="newStaffRole">Role:</label>
+                    <select id="newStaffRole" name="role" class="form-control">
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="staff">Staff</option>
+                        <option value="supervisor">Supervisor</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone number:</label>
-            <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{8}" required>
-        </div>
-
-        <label for="newStaffRole">Role:</label>
-        <select id="newStaffRole" name="role">
-            <option value="admin">Admin</option>
-            <option value="manager">Manager</option>
-            <option value="staff">Staff</option>
-            <option value="supervisor">Supervisor</option>
-        </select>
-
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
+    </div>
+</form>
 {% endblock %}
