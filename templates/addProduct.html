@@ -5,28 +5,56 @@
 {% from "includes/_formHelper.html" import render_field %}
 
 <style>
-
+    .display-4 {display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    }
+    form {
+    width: 70%;
+    margin: 0 auto;
+    }
+    label {font-size: 22px;
+    }
+    form input, form select, form textarea {
+    width: 100%;
+    height: 20%;
+    box-sizing: border-box;
+    }
 </style>
 
-<h1 class="display-4">Add products</h1>
+<h3 class="display-4">Add products</h3>
 <form action="" method="POST" enctype="multipart/form-data">
-    <label for="productName">Product name:</label><br>
-    <input type="text" id="productName" name="productName"><br>
-    <label for="productImage">Product Image:</label><br>
-    <input type= "file" id="productImage" name="productImage"/>
-    <label for="category">Category:</label>
-    <select id="category" name="category">
-        <option value="Coaster">Coaster</option>
-        <option value="Pouch">Pouch</option>
-        <option value="Tote bag">Tote bag</option>
-    </select>
-    <label for="price">Price:</label><br>
-    <input type="text" id="price" name="price" required><br>
-    <label for="stock">Stock:</label><br>
-    <input type="number" id="stock" name="stock"><br>
-    <textarea name="description" rows="10" cols="30">
-    </textarea>
-    <input type="submit" value="Submit" class="btn btn-primary"/>
+    <div class="mb-3 form-control">
+        <label for="productName">Product name:</label><br>
+        <input type="text" id="productName" name="productName"><br>
+    </div>
+    <div class="mb-3 form-control">
+        <label for="productImage">Product Image:</label><br>
+        <input type= "file" id="productImage" name="productImage"/>
+    </div>
+    <div class="mb-3 form-control">
+        <label for="category">Category:</label>
+        <select id="category" name="category">
+            <option value="Coaster">Coaster</option>
+            <option value="Pouch">Pouch</option>
+            <option value="Tote bag">Tote bag</option>
+        </select>
+    </div>
+    <div class="mb-3 form-control">
+        <label for="price">Price:</label><br>
+        <input type="text" id="price" name="price" required><br>
+    </div>
+    <div class="mb-3 form-control">
+        <label for="stock">Stock:</label><br>
+        <input type="number" id="stock" name="stock"><br>
+    </div>
+    <div class="mb-3 form-control">
+        <textarea name="description" rows="10" cols="30"></textarea>
+    </div>
+    <div class="mb-3 form-control">
+        <input type="submit" value="Submit" class="btn btn-primary"/>
+    </div>
 </form>
 {% endblock %}
 
