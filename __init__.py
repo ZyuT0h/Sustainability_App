@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-from Forms import CreateProductForm
+from Forms import CreateProductForm, CreatePointForm
 from datetime import datetime, timedelta
+from Customer import Points
 import re
-import Product
+import Product, Customer
 import shelve
 import bcrypt
 
 app = Flask(__name__)
 app.secret_key = 'something'
+
 
 @app.route('/')
 def home():
@@ -448,82 +450,82 @@ def delete_comment_by_index(index):
             db['comments'] = comments
 
 
-pts = {
-        'customer1': {'points_collected': 100, 'points_redeemed': 50, 'points_left': 50},
-        'customer2': {'points_collected': 150, 'points_redeemed': 30, 'points_left': 120},
-    }
+@app.route('/add_cus_ptss', methods=['GET', 'POST'])
+def add_cus_ptss():
+    add_cus_pts_form = CreatePointForm(request.form)
+    if request.method == "POST" and add_cus_pts_form.validate():
+        add_pts_dict = {}
+        db = shelve.open('points.db', 'c')
+        try:
+            add_pts_dict = db['Points']
+        except:
+            print("Error in retrieving points from points.db")
+
+        points = Points(
+            pts_collected=add_cus_pts_form.pts_collected.data,
+            pts_redeemed=add_cus_pts_form.pts_redeemed.data,
+            pts_left=add_cus_pts_form.pts_left.data)
+
+        add_pts_dict[points.get_customer_id()] = points
+        db['Points'] = add_pts_dict
+
+        db.close()
+
+        return redirect(url_for('point_system'))
+    return render_template('add_cus_ptss.html', form=add_cus_pts_form)
 
 
 @app.route('/pointSystem')
 def point_system():
-    points_data = []
+    points_dict = {}
+    db = shelve.open('points.db', 'r')
+    points_dict = db['Points']
+    db.close()
 
-    for cust_id, points_info in pts.items():
-        points_data.append({
-            'cust_id': cust_id,
-            'pts_collected': points_info['points_collected'],
-            'pts_redeemed': points_info['points_redeemed'],
-            'pts_left': points_info['points_left']
-        })
+    points_list = []
+    for key in points_dict:
+        points = points_dict[key]
+        points_list.append(points)
 
-    return render_template('pointSystem.html', pts=points_data)
+    return render_template('pointSystem.html', count=len(points_list), points_list=points_list)
 
 
-@app.route('/edit_points/<string:cust_id>', methods=['GET', 'POST'])
-def edit_points(cust_id):
-    if request.method == 'GET':
-        # Retrieve customer details based on cust_id and render an edit form
-        # Example: customer = get_customer_details(cust_id)
-        customer_points = pts.get(cust_id, {'points_collected': 0, 'points_redeemed': 0, 'points_left': 0})
-        return render_template('edit_points.html', cust_id=cust_id, customer_points=customer_points)
-    elif request.method == 'POST':
-        # Handle the form submission to update points
-        new_points_collected = int(request.form['new_points_collected'])
-        new_points_redeemed = int(request.form['new_points_redeemed'])
-        new_points_left = int(request.form['new_points_left'])
+@app.route('/edit_points/<int:id>', methods=['GET', 'POST'])
+def edit_points(id):
+    update_points_form = CreatePointForm(request.form)
+    points_dict = {}
 
-        # Update the customer points
-        pts[cust_id]['points_collected'] = new_points_collected
-        pts[cust_id]['points_redeemed'] = new_points_redeemed
-        pts[cust_id]['points_left'] = new_points_left
+    if request.method == 'POST' and update_points_form.validate():
+        db = shelve.open('points.db', 'w')
+        points_dict = db['Points']
+
+        pointU = points_dict.get(id)
+        if pointU:
+            pointU.set_pts_collected(update_points_form.pts_collected.data)
+            pointU.set_pts_redeemed(update_points_form.pts_redeemed.data)
+            pointU.set_pts_left(update_points_form.pts_left.data)
+
+            db['Points'] = points_dict
+            db.close()
 
         return redirect(url_for('point_system'))
+    else:
+        db = shelve.open('points.db', 'r')
+        points_dict = db['Points']
+        db.close()
 
+        pointU = points_dict.get(id)
+        if pointU:
+            update_points_form.pts_collected = pointU.get_pts_collected()
+            update_points_form.pts_redeemed = pointU.get_pts_redeemed()
+            update_points_form.pts_left = pointU.get_pts_left()
+
+            return render_template('edit_points.html', form=update_points_form)
+    return "Invalid ID/ data not found"
 
 @app.route('/delete_points/<string:cust_id>', methods=['GET', 'POST'])
 def delete_points(cust_id):
-    if request.method == 'GET':
-        # Display the delete confirmation template
-        return render_template('delete_points.html', cust_id=cust_id)
-    elif request.method == 'POST':
-        # Handle the deletion of customer points
-        if cust_id in pts:
-            del pts[cust_id]
-        return redirect(url_for('point_system'))
-
-
-@app.route('/add_cus_ptss', methods=['GET', 'POST'])
-def add_cus_ptss():
-    if request.method == 'POST':
-        # Get the form data
-        new_cust_id = request.form['new_cust_id']
-        new_points_collected = request.form['new_points_collected']
-        new_points_redeemed = request.form['new_points_redeemed']
-        new_points_left = request.form['new_points_left']
-
-        # Perform any necessary logic, such as database operations
-        # For simplicity, let's just print the new customer ID
-        pts[new_cust_id] = {
-            'points_collected': new_points_collected,
-            'points_redeemed': new_points_redeemed,
-            'points_left': new_points_left,
-        }
-
-        # Redirect to a success page or return a response
-        return redirect(url_for('point_system'))
-
-    # If it's a GET request, render the form page
-    return render_template('add_cus_ptss.html')
+   return render_template('')
 
 
 if __name__ == '__main__':
