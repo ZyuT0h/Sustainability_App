@@ -4,15 +4,44 @@
 {% block content %}
 <div class="container">
     <h1>Update Staff Profile</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <form action="/update_staff/{{ staff_id }}" method="post">
         <label for="updateStaffEmail">Update Staff Email:</label>
-        <input type="email" id="updateStaffEmail" name="updateStaffEmail" required>
+        <input type="email" id="updateStaffEmail" name="updateStaffEmail"  value="{{ staff['email'] }}">
+        <span>Existing Email: {{ staff['email'] }}</span>
 
         <label for="updateStaffName">Update Staff Name:</label>
-        <input type="text" id="updateStaffName" name="updateStaffName" required>
+        <input type="text" id="updateStaffName" name="updateStaffName" value="{{ staff['name'] }}">
+        <span>Existing Name: {{ staff['name'] }}</span>
 
         <label for="updateStaffPhone">Update Staff Phone Number:</label>
-        <input type="tel" id="updateStaffPhone" name="updateStaffPhone" required>
+        <input type="tel" id="updateStaffPhone" name="updateStaffPhone" value="{{ staff['phone'] }}" pattern="[0-9]{8}">
+        <span>Existing Phone: {{ staff['phone'] }}</span>
+
+        <label for="updateStaffRole">Role:</label>
+        <select id="updateStaffRole" name="updateStaffRole">
+            <option value="admin" {% if staff['role'] == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="manager" {% if staff['role'] == 'manager' %}selected{% endif %}>Manager</option>
+            <option value="staff" {% if staff['role'] == 'staff' %}selected{% endif %}>Staff</option>
+            <option value="supervisor" {% if staff['role'] == 'supervisor' %}selected{% endif %}>Supervisor</option>
+        </select>
+        <span>Existing Role: {{ staff['role'] }}</span>
+
+        <!-- Add hidden input fields to store the existing values -->
+        <input type="hidden" name="existingStaffEmail" value="{{ staff['email'] }}">
+        <input type="hidden" name="existingStaffName" value="{{ staff['name'] }}">
+        <input type="hidden" name="existingStaffPhone" value="{{ staff['phone'] }}">
+        <input type="hidden" name="existingStaffRole" value="{{ staff['role'] }}">
 
         <button type="submit">Update</button>
     </form>

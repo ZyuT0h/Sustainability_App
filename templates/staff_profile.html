@@ -11,6 +11,7 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone Number</th>
+                <th>Role</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -21,6 +22,15 @@
                     <td>{{ staff['name'] }}</td>
                     <td>{{ staff['email'] }}</td>
                     <td>{{ staff['phone'] }}</td>
+                    <td>
+                        {% if staff['staff_id'] == staff_id_being_updated %}
+                            <select class="roleDropdown" data-staff-id="{{ staff['staff_id'] }}" onchange="changeRole(this)">
+                                <option value="{{ staff['role'] }}" selected>{{ staff['role'] }}</option>
+                            </select>
+                        {% else %}
+                            {{ staff['role'] }}
+                        {% endif %}
+                    </td>
                     <td>
                         <a href="/update_staff/{{ staff['staff_id'] }}">Update</a>
                         <a href="#" data-toggle="modal" data-target="#deleteStaffModal_{{ staff['staff_id'] }}">Delete</a>
@@ -61,4 +71,34 @@
 <!-- Bootstrap and jQuery Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function changeRole(dropdown) {
+        var staffId = dropdown.getAttribute('data-staff-id');
+        var selectedRole = dropdown.value;
+
+        // You may want to use AJAX to send the updated role to the server here
+        // For simplicity, you can console.log the values for now
+        console.log("Staff ID: " + staffId + ", New Role: " + selectedRole);
+    }
+
+    // Disable dropdowns that are not being updated
+    document.addEventListener("DOMContentLoaded", function() {
+        var staffIdBeingUpdated = "{{ staff_id_being_updated }}";  // Assuming you pass this value when rendering the template
+
+        var dropdowns = document.querySelectorAll('.roleDropdown');
+        dropdowns.forEach(function(dropdown) {
+            var staffId = dropdown.getAttribute('data-staff-id');
+            if (staffId !== staffIdBeingUpdated) {
+                dropdown.disabled = true;
+            } else {
+                dropdown.addEventListener('change', function() {
+                    // Enable other dropdowns when the selected one changes
+                    dropdowns.forEach(function(otherDropdown) {
+                        otherDropdown.disabled = (otherDropdown !== dropdown);
+                    });
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}

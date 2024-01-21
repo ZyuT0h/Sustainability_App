@@ -1,25 +1,25 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-from Forms import CreateProductForm, CreatePointForm
+from werkzeug.utils import secure_filename
+import os
+from Product import Product
 from datetime import datetime, timedelta
-from Customer import Points
+from report import MonthlyReport, get_report_data, save_report, load_report
+import random
 import re
-import Product, Customer
 import shelve
 import bcrypt
 
+
 app = Flask(__name__)
 app.secret_key = 'something'
-
 
 @app.route('/')
 def home():
     return render_template('home.html')
 
-
 @app.route('/homeUser')
 def home_user():
     return render_template('homeUser.html')
-
 
 @app.route('/homeAdmin')
 def home_admin():
@@ -138,6 +138,7 @@ def change_password():
 
                 if password_changed:
                     # Password has already been changed, redirect to staff profile or other page
+                    flash('Password has already been changed.', 'error')
                     return redirect('/staff_profile')
 
                 # If the password hasn't been changed, verify the current password
@@ -175,7 +176,6 @@ def change_password():
                 else:
                     flash('Incorrect current password.', 'error')
                     return redirect('/change_password')
-
     return render_template('change_password.html')
 
 @app.route('/check_current_password', methods=['POST'])
@@ -200,11 +200,21 @@ def check_current_password():
     return jsonify(success=False)
 @app.route('/shop')
 def shop():
-    return render_template('shop.html')
+    products_dict = {}
+    db = shelve.open('product.db', 'r')
+    products_dict = db['Products']
+    db.close()
+
+    products_list = []
+    for key in products_dict:
+        product = products_dict.get(key)
+        products_list.append(product)
+    return render_template('shop.html', products_list=products_list)
 
 
 @app.route('/cart')
 def cart():
+
     return render_template('cart.html')
 
 # Open the shelve file for staff profiles
@@ -227,21 +237,41 @@ def staff_profiles():
 # Update staff profile
 @app.route('/update_staff/<staff_id>', methods=['GET', 'POST'])
 def update_staff(staff_id):
+    staff_data = get_staff_data()
+    staff = next((s for s in staff_data if s['staff_id'] == staff_id), None)
+
     if request.method == 'POST':
-        update_staff_email = request.form['updateStaffEmail']
-        update_staff_name = request.form['updateStaffName']
-        update_staff_phone = request.form['updateStaffPhone']
-        staff_data = get_staff_data()
-        for staff in staff_data:
-            if staff['staff_id'] == staff_id:
-                staff['email'] = update_staff_email
-                staff['name'] = update_staff_name
-                staff['phone'] = update_staff_phone
-                with open_staff_db() as db:
-                    db['staff_data'] = staff_data  # Update the staff data in the shelve file
-                break
-        return redirect('/staff_profile')  # Redirect to staff profile page after successful update
-    return render_template('update_staff_profile.html', staff_id=staff_id)
+        # Fetch the existing staff data for display
+        existing_staff_data = get_staff_data()
+
+        if staff:
+            update_staff_email = request.form['updateStaffEmail']
+            update_staff_name = request.form['updateStaffName']
+            update_staff_phone = request.form['updateStaffPhone']
+            update_staff_role = request.form['updateStaffRole']
+
+            # Check if the email is already registered (excluding the current staff being updated)
+            if any(s['email'] == update_staff_email and s['staff_id'] != staff_id for s in staff_data):
+                flash("Email address is already registered.", "error")
+                return render_template('update_staff_profile.html', staff=staff, staff_id=staff_id)
+
+            staff['email'] = update_staff_email
+            staff['name'] = update_staff_name
+            staff['phone'] = update_staff_phone
+            staff['role'] = update_staff_role
+
+            with open_staff_db() as db:
+                db['staff_data'] = staff_data  # Update the staff data in the shelve file
+
+            return redirect('/staff_profile')  # Redirect to staff profile page after successful update
+
+    # Fetch staff data for the specified staff_id
+    if staff:
+        return render_template('update_staff_profile.html', staff=staff, staff_id=staff_id)
+    else:
+        # Handle the case where staff with the given ID is not found
+        flash("Staff not found", "error")
+        return redirect('/staff_profile')
 
 # Delete staff profile
 @app.route('/delete_staff/<staff_id>')
@@ -260,8 +290,21 @@ def register_staff():
         new_staff_email = request.form['email']
         new_staff_name = request.form['name']
         new_staff_phone = request.form['phone']
+        new_staff_role = request.form['role']
+
         staff_data = get_staff_data()
-        new_staff_id = str(len(staff_data) + 1)
+
+        # Check if the email is already registered
+        if any(staff['email'] == new_staff_email for staff in staff_data):
+            flash("Email address is already registered.", "error")
+            return render_template('register_staff.html')
+
+        # Generate a unique staff ID based on the first few characters of the name and a random number
+        new_staff_id = f"{new_staff_name[:3]}{random.randint(100, 999)}"
+
+        # Check if the generated ID is already in use
+        while any(staff['staff_id'] == new_staff_id for staff in staff_data):
+            new_staff_id = f"{new_staff_name[:3]}{random.randint(100, 999)}"
 
         # Hashing the default password (e.g., 'password123')
         default_password = 'password123'
@@ -272,7 +315,8 @@ def register_staff():
             'email': new_staff_email,
             'name': new_staff_name,
             'phone': new_staff_phone,
-            'password': hashed_password  # Storing hashed password
+            'role': new_staff_role,
+            'password': hashed_password # Storing hashed password
         })
 
         with open_staff_db() as db:
@@ -304,28 +348,64 @@ def order_details():
 
     return render_template('order_details.html', orders=order_data)
 
+@app.route('/generate_report/<month>')
+def generate_report(month):
+    report = get_report_data(month)
+    save_report(month, report)
+    return render_template('report.html', report=report)
+
+@app.route('/view_report/<month>')
+def view_report(month):
+    report = load_report(month)
+    return render_template('report.html', report=report)
+
+@app.route('/report')
+def report():
+    # Replace this with your actual logic for generating the report
+    report_data = {
+        'month': 'January',
+        'sales': {'Product A': 100, 'Product B': 150, 'Product C': 80},
+        'most_profitable_product': 'Product B',
+        'donations': {'Donation A': 200, 'Donation B': 300, 'Donation C': 150}
+    }
+
+    return render_template('report.html', report=report_data)
+
+# Set the upload folder outside of the route function
+app.config['UPLOAD_FOLDER'] = 'product_images'
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
-    create_product_form = CreateProductForm(request.form)
-    if request.method == 'POST' and create_product_form.validate():
+    if request.method == 'POST':
+        product = Product(
+            product_name=request.form['productName'],
+            category=request.form['category'],
+            stock=request.form['stock'],
+            price=request.form['price'],
+            description=request.form['description'],
+        )
+
+        # Handle file upload
+        if 'productImage' in request.files:
+            file = request.files['productImage']
+            if file.filename != '':
+                # Save the file with a secure filename
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                product.set_product_image(filename)
+
         products_dict = {}
         db = shelve.open('product.db', 'c')
         try:
             products_dict = db['Products']
         except:
             print('Error in retrieving Products from product.db.')
-        product = Product.Product(create_product_form.product_name.data,
-                                  create_product_form.category.data,
-                                  create_product_form.stock.data,
-                                  create_product_form.price.data,
-                                  create_product_form.description.data)
         products_dict[product.get_product_id()] = product
         db['Products'] = products_dict
         db.close()
-        return redirect(url_for('manage_inventory'))
-    return render_template('addProduct.html', form=create_product_form)
 
+        return redirect(url_for('manage_inventory'))
+    return render_template('addProduct.html')
 
 @app.route('/manageInventory')
 def manage_inventory():
@@ -341,22 +421,45 @@ def manage_inventory():
 
     return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
 
+'''
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' in request.files:
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # Here you should save the file
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return 'File uploaded successfully'
+    return 'No file uploaded'
+'''
 
 @app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
 def update_product(id):
-    update_product_form = CreateProductForm(request.form)
-    if request.method == 'POST' and update_product_form.validate():
+    if request.method == 'POST':
         products_dict = {}
         db = shelve.open('product.db', 'w')
         products_dict = db['Products']
         product = products_dict.get(id)
-        product.set_product_name(update_product_form.product_name.data)
-        product.set_category(update_product_form.category.data)
-        product.set_stock(update_product_form.stock.data)
-        product.set_price(update_product_form.price.data)
-        product.set_description(update_product_form.description.data)
+
+        # Use request.form to get form data
+        product.set_product_name(request.form['productName'])
+        product.set_category(request.form['category'])
+        product.set_stock(request.form['stock'])
+        product.set_price(request.form['price'])
+        product.set_description(request.form['description'])
+
+        # Handle file upload
+        if 'productImage' in request.files:
+            file = request.files['productImage']
+            if file.filename != '':
+                # Save the file with a secure filename
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                product.set_product_image(filename)
+
         db['Products'] = products_dict
         db.close()
+
         return redirect(url_for('manage_inventory'))
     else:
         products_dict = {}
@@ -364,13 +467,17 @@ def update_product(id):
         products_dict = db['Products']
         db.close()
         product = products_dict.get(id)
-        update_product_form.product_name.data = product.get_product_name()
-        update_product_form.category.data = product.get_category()
-        update_product_form.stock.data = product.get_stock()
-        update_product_form.price.data = product.get_price()
-        update_product_form.description.data = product.get_description()
-        return render_template('updateProduct.html', form=update_product_form)
 
+        # Use request.form to populate form data
+        product_name_data = product.get_product_name()
+        category_data = product.get_category()
+        stock_data = product.get_stock()
+        price_data = product.get_price()
+        description_data = product.get_description()
+
+        return render_template('updateProduct.html', product_name_data=product_name_data,
+                               category_data=category_data, stock_data=stock_data,
+                               price_data=price_data, description_data=description_data)
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])
 def delete_product(id):
@@ -450,82 +557,82 @@ def delete_comment_by_index(index):
             db['comments'] = comments
 
 
-@app.route('/add_cus_ptss', methods=['GET', 'POST'])
-def add_cus_ptss():
-    add_cus_pts_form = CreatePointForm(request.form)
-    if request.method == "POST" and add_cus_pts_form.validate():
-        add_pts_dict = {}
-        db = shelve.open('points.db', 'c')
-        try:
-            add_pts_dict = db['Points']
-        except:
-            print("Error in retrieving points from points.db")
-
-        points = Points(
-            pts_collected=add_cus_pts_form.pts_collected.data,
-            pts_redeemed=add_cus_pts_form.pts_redeemed.data,
-            pts_left=add_cus_pts_form.pts_left.data)
-
-        add_pts_dict[points.get_customer_id()] = points
-        db['Points'] = add_pts_dict
-
-        db.close()
-
-        return redirect(url_for('point_system'))
-    return render_template('add_cus_ptss.html', form=add_cus_pts_form)
+pts = {
+        'customer1': {'points_collected': 100, 'points_redeemed': 50, 'points_left': 50},
+        'customer2': {'points_collected': 150, 'points_redeemed': 30, 'points_left': 120},
+    }
 
 
 @app.route('/pointSystem')
 def point_system():
-    points_dict = {}
-    db = shelve.open('points.db', 'r')
-    points_dict = db['Points']
-    db.close()
+    points_data = []
 
-    points_list = []
-    for key in points_dict:
-        points = points_dict[key]
-        points_list.append(points)
+    for cust_id, points_info in pts.items():
+        points_data.append({
+            'cust_id': cust_id,
+            'pts_collected': points_info['points_collected'],
+            'pts_redeemed': points_info['points_redeemed'],
+            'pts_left': points_info['points_left']
+        })
 
-    return render_template('pointSystem.html', count=len(points_list), points_list=points_list)
+    return render_template('pointSystem.html', pts=points_data)
 
 
-@app.route('/edit_points/<int:id>', methods=['GET', 'POST'])
-def edit_points(id):
-    update_points_form = CreatePointForm(request.form)
-    points_dict = {}
+@app.route('/edit_points/<string:cust_id>', methods=['GET', 'POST'])
+def edit_points(cust_id):
+    if request.method == 'GET':
+        # Retrieve customer details based on cust_id and render an edit form
+        # Example: customer = get_customer_details(cust_id)
+        customer_points = pts.get(cust_id, {'points_collected': 0, 'points_redeemed': 0, 'points_left': 0})
+        return render_template('edit_points.html', cust_id=cust_id, customer_points=customer_points)
+    elif request.method == 'POST':
+        # Handle the form submission to update points
+        new_points_collected = int(request.form['new_points_collected'])
+        new_points_redeemed = int(request.form['new_points_redeemed'])
+        new_points_left = int(request.form['new_points_left'])
 
-    if request.method == 'POST' and update_points_form.validate():
-        db = shelve.open('points.db', 'w')
-        points_dict = db['Points']
-
-        pointU = points_dict.get(id)
-        if pointU:
-            pointU.set_pts_collected(update_points_form.pts_collected.data)
-            pointU.set_pts_redeemed(update_points_form.pts_redeemed.data)
-            pointU.set_pts_left(update_points_form.pts_left.data)
-
-            db['Points'] = points_dict
-            db.close()
+        # Update the customer points
+        pts[cust_id]['points_collected'] = new_points_collected
+        pts[cust_id]['points_redeemed'] = new_points_redeemed
+        pts[cust_id]['points_left'] = new_points_left
 
         return redirect(url_for('point_system'))
-    else:
-        db = shelve.open('points.db', 'r')
-        points_dict = db['Points']
-        db.close()
 
-        pointU = points_dict.get(id)
-        if pointU:
-            update_points_form.pts_collected = pointU.get_pts_collected()
-            update_points_form.pts_redeemed = pointU.get_pts_redeemed()
-            update_points_form.pts_left = pointU.get_pts_left()
-
-            return render_template('edit_points.html', form=update_points_form)
-    return "Invalid ID/ data not found"
 
 @app.route('/delete_points/<string:cust_id>', methods=['GET', 'POST'])
 def delete_points(cust_id):
-   return render_template('')
+    if request.method == 'GET':
+        # Display the delete confirmation template
+        return render_template('delete_points.html', cust_id=cust_id)
+    elif request.method == 'POST':
+        # Handle the deletion of customer points
+        if cust_id in pts:
+            del pts[cust_id]
+        return redirect(url_for('point_system'))
+
+
+@app.route('/add_cus_ptss', methods=['GET', 'POST'])
+def add_cus_ptss():
+    if request.method == 'POST':
+        # Get the form data
+        new_cust_id = request.form['new_cust_id']
+        new_points_collected = request.form['new_points_collected']
+        new_points_redeemed = request.form['new_points_redeemed']
+        new_points_left = request.form['new_points_left']
+
+        # Perform any necessary logic, such as database operations
+        # For simplicity, let's just print the new customer ID
+        pts[new_cust_id] = {
+            'points_collected': new_points_collected,
+            'points_redeemed': new_points_redeemed,
+            'points_left': new_points_left,
+        }
+
+        # Redirect to a success page or return a response
+        return redirect(url_for('point_system'))
+
+    # If it's a GET request, render the form page
+    return render_template('add_cus_ptss.html')
 
 
 if __name__ == '__main__':

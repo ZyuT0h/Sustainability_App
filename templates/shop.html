@@ -2,7 +2,50 @@
 {% block title %}Library Loan System - Home{% endblock %}
 
 {% block content %}
-
-  <h1>Shop heffffreeeeeee</h1>
-
+<style>
+    .container {width:10%; float: left; border: 4px green solid;
+    }
+    .container2 {width:89%; float: right; border: 4px green solid;
+    }
+    div {border: 0px red solid;
+    }
+</style>
+<h1>Shop</h1>
+<div class="container">
+    <div class="category">
+        <h5>Categories</h5>
+        <a href=""></a>
+        <a href=""></a>
+        <a href=""></a>
+    </div>
+</div>
+<div class="container2">
+    <div class="item">
+        {% for product in products_list %}
+        <div class="row">
+    	    <div class="col-sm">
+                {{ product.get_product_name() }}
+            </div>
+  	    </div>
+        <div>
+            <div class="row">
+                <div class="col-sm">
+                {% if product.get_product_image() %}
+                <img src="{{ url_for('static', filename='product_images/' + product.get_product_image()) }}" alt="{{ product.get_product_name() }} Image" style="max-width: 300px; max-height: 300px;">
+                {% else %}
+                No Image
+                {% endif %}
+                </div>
+                <div class="col-sm">
+                    {{ product.get_description() }}
+                    <br>
+                    {{ product.get_price() }}
+                    <a href="/updateProduct/{{product.get_product_id()}}" class="btn btn-warning">Update</a>
+                    <a href="/updateProduct/{{product.get_product_id()}}" class="btn btn-warning">Update</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
