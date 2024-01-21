@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
-from Forms import CreateProductForm
+from werkzeug.utils import secure_filename
+import os
+from Product import Product
 from datetime import datetime, timedelta
 from report import MonthlyReport, get_report_data, save_report, load_report
 import random
 import re
-import Product
 import shelve
 import bcrypt
+
 
 app = Flask(__name__)
 app.secret_key = 'something'
@@ -369,26 +371,41 @@ def report():
 
     return render_template('report.html', report=report_data)
 
+# Set the upload folder outside of the route function
+# app.config['UPLOAD_FOLDER'] = 'product_images'
+
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
-    create_product_form = CreateProductForm(request.form)
-    if request.method == 'POST' and create_product_form.validate():
+    if request.method == 'POST':
+        product = Product(
+            product_name=request.form['productName'],
+            category=request.form['category'],
+            stock=request.form['stock'],
+            price=request.form['price'],
+            description=request.form['description'],
+        )
+
+        # Handle file upload
+        if 'productImage' in request.files:
+            file = request.files['productImage']
+            if file.filename != '':
+                # Save the file with a secure filename
+                filename = secure_filename(file.filename)
+                file.save(os.path.join('static', 'product_images', filename))
+                product.set_product_image(filename)
+
         products_dict = {}
         db = shelve.open('product.db', 'c')
         try:
             products_dict = db['Products']
         except:
             print('Error in retrieving Products from product.db.')
-        product = Product.Product(create_product_form.product_name.data,
-                                  create_product_form.category.data,
-                                  create_product_form.stock.data,
-                                  create_product_form.price.data,
-                                  create_product_form.description.data)
         products_dict[product.get_product_id()] = product
         db['Products'] = products_dict
         db.close()
+
         return redirect(url_for('manage_inventory'))
-    return render_template('addProduct.html', form=create_product_form)
+    return render_template('addProduct.html')
 
 @app.route('/manageInventory')
 def manage_inventory():
@@ -404,22 +421,50 @@ def manage_inventory():
 
     return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
 
+'''
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' in request.files:
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # Here you should save the file
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return 'File uploaded successfully'
+    return 'No file uploaded'
+'''
 
 @app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
 def update_product(id):
-    update_product_form = CreateProductForm(request.form)
-    if request.method == 'POST' and update_product_form.validate():
+    if request.method == 'POST':
         products_dict = {}
         db = shelve.open('product.db', 'w')
         products_dict = db['Products']
         product = products_dict.get(id)
-        product.set_product_name(update_product_form.product_name.data)
-        product.set_category(update_product_form.category.data)
-        product.set_stock(update_product_form.stock.data)
-        product.set_price(update_product_form.price.data)
-        product.set_description(update_product_form.description.data)
+
+        # Use request.form to get form data
+        product.set_product_name(request.form['productName'])
+        product.set_category(request.form['category'])
+        product.set_stock(request.form['stock'])
+        product.set_price(request.form['price'])
+        product.set_description(request.form['description'])
+
+        # Handle file upload
+        if 'productImage' in request.files:
+            file = request.files['productImage']
+            if file.filename != '':
+                # Delete the old image file
+                old_image_path = os.path.join('static', 'product_images', product.get_product_image())
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+
+                # Save the new file with a secure filename
+                filename = secure_filename(file.filename)
+                file.save(os.path.join('static', 'product_images', filename))
+                product.set_product_image(filename)
+
         db['Products'] = products_dict
         db.close()
+
         return redirect(url_for('manage_inventory'))
     else:
         products_dict = {}
@@ -427,13 +472,17 @@ def update_product(id):
         products_dict = db['Products']
         db.close()
         product = products_dict.get(id)
-        update_product_form.product_name.data = product.get_product_name()
-        update_product_form.category.data = product.get_category()
-        update_product_form.stock.data = product.get_stock()
-        update_product_form.price.data = product.get_price()
-        update_product_form.description.data = product.get_description()
-        return render_template('updateProduct.html', form=update_product_form)
 
+        # Use request.form to populate form data
+        product_name_data = product.get_product_name()
+        category_data = product.get_category()
+        stock_data = product.get_stock()
+        price_data = product.get_price()
+        description_data = product.get_description()
+
+        return render_template('updateProduct.html', product_name_data=product_name_data,
+                               category_data=category_data, stock_data=stock_data,
+                               price_data=price_data, description_data=description_data)
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])
 def delete_product(id):

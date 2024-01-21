@@ -18,6 +18,7 @@
         <tr>
             <th>Product ID</th>
             <th>Product Name</th>
+            <th>Product Image</th>
             <th>Category</th>
             <th>Stock</th>
             <th>Price</th>
@@ -31,6 +32,13 @@
         <tr>
             <td>{{ product.get_product_id() }}</td>
             <td>{{ product.get_product_name() }}</td>
+            <td>
+                {% if product.get_product_image() %}
+                <img src="{{ url_for('static', filename='product_images/' + product.get_product_image()) }}" style="max-width: 60px; max-height: 60px;">
+                {% else %}
+                No Image
+                {% endif %}
+            </td>
             <td>{{ product.get_category() }}</td>
             <td>{{ product.get_stock() }}</td>
             <td>{{ product.get_price() }}</td>

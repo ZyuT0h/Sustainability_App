@@ -2,25 +2,12 @@
 
 class Product:
     count_id = 0
-    # index_dict = {}
-    # db = shelve.open('index.db', 'c')
-    # try:
-    #     index_dict = db['Index']
-    #     for key in index_dict:
-    #         if count_id == index_dict.get(key):
-    #             count_id += 1
-    #
-    # except:
-    #     print('Error in retrieving Index from index.db.')
-    #
-    # index_dict[count_id] = count_id
-    # db['Index'] = index_dict
 
     def __init__(self, product_name, category, stock, price, description):
         Product.count_id += 1
         self.__product_id = Product.count_id
         self.__product_name = product_name
-        self.__product_image = product_image
+        self.__product_image = None
         self.__category = category
         self.__stock = stock
         self.__price = price
