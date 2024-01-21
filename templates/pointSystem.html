@@ -19,9 +19,11 @@
                 <td>{{ points.get_pts_collected() }}</td>
                 <td>{{ points.get_pts_redeemed() }}</td>
                 <td>{{ points.get_pts_left() }}</td>
+                <td><a href="/edit_points/{{ points.get_customer_id() }}" class="btn btn-warning">Update</a></td>
                 <td>
-                    <form action="" method="POST">
-                    <a href="/edit_points/{{points.get_customer_id()}}" class="btn btn-warning">Edit</a>
+                    <form action="{{ url_for('delete_points', cust_id=points.get_customer_id()) }}" method="POST">
+                    <input type="submit" value="Delete" class="btn btn-danger"
+                           onclick="return confirm('Are you sure you want to delete Customer ID {{points.get_customer_id()}}?')">
                     </form>
                 </td>
 
@@ -29,6 +31,5 @@
         {% endfor %}
     </tbody>
 </table>
-<a href="{{ url_for('add_cus_ptss') }}" class="btn btn-success">Add</a>
 
 {% endblock %}

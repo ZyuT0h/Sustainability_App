@@ -604,16 +604,54 @@ def point_system():
     return render_template('pointSystem.html', count=len(points_list), points_list=points_list)
 
 
-@app.route('/edit_points/<string:cust_id>', methods=['GET', 'POST'])
+@app.route('/edit_points/<int:cust_id>', methods=['GET', 'POST'])
 def edit_points(cust_id):
+    edit_points_form = CreatePointForm(request.form)
+    if request.method == "POST" and edit_points_form.validate():
+        points_dict = {}
+        db = shelve.open('points.db', writeback=True)
+        points_dict = db['Points']
 
-    return render_template('edit_points.html')
+        rpoints = points_dict.get(cust_id)
+        rpoints.set_customer_id(edit_points_form.cust_id.data)
+        rpoints.set_pts_collected(edit_points_form.pts_collected.data)
+        rpoints.set_pts_redeemed(edit_points_form.pts_redeemed.data)
+        rpoints.set_pts_left(edit_points_form.pts_left.data)
+
+        db['Points'] = points_dict
+        db.close()
+
+        return redirect(url_for("point_system"))
+    else:
+        points_dict = {}
+        db = shelve.open('points.db', 'r')
+        points_dict = db['Points']
+        db.close()
+
+        rpoints = points_dict.get(cust_id)
+        edit_points_form.cust_id.data = rpoints.get_customer_id()
+        edit_points_form.pts_collected.data = rpoints.get_pts_collected()
+        edit_points_form.pts_redeemed.data = rpoints.get_pts_redeemed()
+        edit_points_form.pts_left.data = rpoints.get_pts_left()
+
+        return render_template('edit_points.html', form=edit_points_form)
 
 
-@app.route('/delete_points/<string:cust_id>', methods=['GET', 'POST'])
+@app.route('/delete_points/<int:cust_id>', methods=['POST'])
 def delete_points(cust_id):
+    db = shelve.open('points.db', 'w')
+    points_dict = db.get('Points', {})
 
-    return render_template('delete_points.html', cust_id=cust_id)
+    # Check if cust_id exists in the dictionary before attempting to delete
+    if cust_id in points_dict:
+        points_dict.pop(cust_id)
+        db['Points'] = points_dict
+        db.close()
+        print(f"Deletion successful for customer ID: {cust_id}")
+    else:
+        print(f"Customer ID {cust_id} not found in points_dict")
+
+    return redirect(url_for('point_system'))
 
 
 @app.route('/add_cus_ptss', methods=['GET', 'POST'])

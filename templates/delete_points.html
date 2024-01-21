@@ -1,7 +1,7 @@
 
 <h1>Delete Confirmation</h1>
 <p>Are you sure you want to delete the points for Customer {{ cust_id }}?</p>
-<form method="post" action="{{ url_for('delete_points', cust_id=cust_id) }}">
+<form method="Post" action="{{ url_for('delete_points', cust_id=cust_id) }}">
     <button type="submit">Confirm Delete</button>
     <a href="{{ url_for('point_system') }}">Cancel</a>
 </form>
