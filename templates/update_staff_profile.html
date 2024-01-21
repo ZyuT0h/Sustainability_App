@@ -2,8 +2,54 @@
 {% block title %}Update Staff Profile{% endblock %}
 
 {% block content %}
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px; /* Added padding for better appearance */
+    }
+
+    h1 {
+        margin-bottom: 20px; /* Added margin for spacing */
+    }
+
+    form {
+        width: 70%;
+        margin: 20px 0;
+    }
+
+    label {
+        font-size: 22px;
+    }
+
+    input, select {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        height: 40px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Separate existing information from update fields */
+    span {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 15px;
+    }
+</style>
+
 <div class="container">
-    <h1>Update Staff Profile</h1>
+    <h1 class="display-4">Update Staff Profile</h1>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -16,26 +62,34 @@
     {% endwith %}
 
     <form action="/update_staff/{{ staff_id }}" method="post">
-        <label for="updateStaffEmail">Update Staff Email:</label>
-        <input type="email" id="updateStaffEmail" name="updateStaffEmail"  value="{{ staff['email'] }}">
-        <span>Existing Email: {{ staff['email'] }}</span>
+        <div>
+            <label for="updateStaffEmail">Update Staff Email:</label>
+            <input type="email" id="updateStaffEmail" name="updateStaffEmail" value="{{ staff['email'] }}">
+            <span>Existing Email: {{ staff['email'] }}</span>
+        </div>
 
-        <label for="updateStaffName">Update Staff Name:</label>
-        <input type="text" id="updateStaffName" name="updateStaffName" value="{{ staff['name'] }}">
-        <span>Existing Name: {{ staff['name'] }}</span>
+        <div>
+            <label for="updateStaffName">Update Staff Name:</label>
+            <input type="text" id="updateStaffName" name="updateStaffName" value="{{ staff['name'] }}">
+            <span>Existing Name: {{ staff['name'] }}</span>
+        </div>
 
-        <label for="updateStaffPhone">Update Staff Phone Number:</label>
-        <input type="tel" id="updateStaffPhone" name="updateStaffPhone" value="{{ staff['phone'] }}" pattern="[0-9]{8}">
-        <span>Existing Phone: {{ staff['phone'] }}</span>
+        <div>
+            <label for="updateStaffPhone">Update Staff Phone Number:</label>
+            <input type="tel" id="updateStaffPhone" name="updateStaffPhone" value="{{ staff['phone'] }}" pattern="[0-9]{8}">
+            <span>Existing Phone: {{ staff['phone'] }}</span>
+        </div>
 
-        <label for="updateStaffRole">Role:</label>
-        <select id="updateStaffRole" name="updateStaffRole">
-            <option value="admin" {% if staff['role'] == 'admin' %}selected{% endif %}>Admin</option>
-            <option value="manager" {% if staff['role'] == 'manager' %}selected{% endif %}>Manager</option>
-            <option value="staff" {% if staff['role'] == 'staff' %}selected{% endif %}>Staff</option>
-            <option value="supervisor" {% if staff['role'] == 'supervisor' %}selected{% endif %}>Supervisor</option>
-        </select>
-        <span>Existing Role: {{ staff['role'] }}</span>
+        <div>
+            <label for="updateStaffRole">Role:</label>
+            <select id="updateStaffRole" name="updateStaffRole">
+                <option value="admin" {% if staff['role'] == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="manager" {% if staff['role'] == 'manager' %}selected{% endif %}>Manager</option>
+                <option value="staff" {% if staff['role'] == 'staff' %}selected{% endif %}>Staff</option>
+                <option value="supervisor" {% if staff['role'] == 'supervisor' %}selected{% endif %}>Supervisor</option>
+            </select>
+            <span>Existing Role: {{ staff['role'] }}</span>
+        </div>
 
         <!-- Add hidden input fields to store the existing values -->
         <input type="hidden" name="existingStaffEmail" value="{{ staff['email'] }}">

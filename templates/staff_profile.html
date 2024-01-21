@@ -2,43 +2,70 @@
 {% block title %}Staff Profiles{% endblock %}
 
 {% block content %}
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 20px; /* Added padding for better appearance */
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Allow horizontal scrolling if needed */
+        margin-top: 20px;
+    }
+
+    .roleDropdown {
+        width: auto;
+    }
+
+    .btn-success {
+        margin-top: 20px;
+        align-self: flex-start; /* Align the button to the left */
+    }
+</style>
+
 <div class="container">
-    <h1>Staff Profiles</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Staff ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for staff in staff_data %}
+    <h1 class="display-4">Staff Profiles</h1>
+    <div class="table-container">
+        <table class="table table-striped">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ staff['staff_id'] }}</td>
-                    <td>{{ staff['name'] }}</td>
-                    <td>{{ staff['email'] }}</td>
-                    <td>{{ staff['phone'] }}</td>
-                    <td>
-                        {% if staff['staff_id'] == staff_id_being_updated %}
-                            <select class="roleDropdown" data-staff-id="{{ staff['staff_id'] }}" onchange="changeRole(this)">
-                                <option value="{{ staff['role'] }}" selected>{{ staff['role'] }}</option>
-                            </select>
-                        {% else %}
-                            {{ staff['role'] }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="/update_staff/{{ staff['staff_id'] }}">Update</a>
-                        <a href="#" data-toggle="modal" data-target="#deleteStaffModal_{{ staff['staff_id'] }}">Delete</a>
-                    </td>
+                    <th>Staff ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Role</th>
+                    <th>Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for staff in staff_data %}
+                    <tr>
+                        <td>{{ staff['staff_id'] }}</td>
+                        <td>{{ staff['name'] }}</td>
+                        <td>{{ staff['email'] }}</td>
+                        <td>{{ staff['phone'] }}</td>
+                        <td>
+                            {% if staff['staff_id'] == staff_id_being_updated %}
+                                <select class="form-control roleDropdown" data-staff-id="{{ staff['staff_id'] }}" onchange="changeRole(this)">
+                                    <option value="{{ staff['role'] }}" selected>{{ staff['role'] }}</option>
+                                </select>
+                            {% else %}
+                                {{ staff['role'] }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/update_staff/{{ staff['staff_id'] }}" class="btn btn-warning">Update</a>
+                            <a href="#" data-toggle="modal" data-target="#deleteStaffModal_{{ staff['staff_id'] }}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     <a href="/register_staff" class="btn btn-success">Add Staff</a>
 </div>
 
@@ -80,25 +107,5 @@
         // For simplicity, you can console.log the values for now
         console.log("Staff ID: " + staffId + ", New Role: " + selectedRole);
     }
-
-    // Disable dropdowns that are not being updated
-    document.addEventListener("DOMContentLoaded", function() {
-        var staffIdBeingUpdated = "{{ staff_id_being_updated }}";  // Assuming you pass this value when rendering the template
-
-        var dropdowns = document.querySelectorAll('.roleDropdown');
-        dropdowns.forEach(function(dropdown) {
-            var staffId = dropdown.getAttribute('data-staff-id');
-            if (staffId !== staffIdBeingUpdated) {
-                dropdown.disabled = true;
-            } else {
-                dropdown.addEventListener('change', function() {
-                    // Enable other dropdowns when the selected one changes
-                    dropdowns.forEach(function(otherDropdown) {
-                        otherDropdown.disabled = (otherDropdown !== dropdown);
-                    });
-                });
-            }
-        });
-    });
 </script>
 {% endblock %}
