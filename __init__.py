@@ -4,6 +4,8 @@ import os
 from Product import Product
 from datetime import datetime, timedelta
 from report import MonthlyReport, get_report_data, save_report, load_report
+from Forms import CreatePointForm
+from Customer import Points
 import random
 import re
 import shelve
@@ -13,19 +15,23 @@ import bcrypt
 app = Flask(__name__)
 app.secret_key = 'something'
 
+
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 @app.route('/homeUser')
 def home_user():
     return render_template('homeUser.html')
 
+
 @app.route('/homeAdmin')
 def home_admin():
     return render_template('homeAdmin.html')
 
-# Open the shelve file in writeback mode for registration
+
+# Open the shelve file in writeback mode for registratio
 @app.route('/register', methods=['GET', 'POST'])
 def register():
         if request.method == 'POST':
@@ -57,6 +63,7 @@ def register():
 
         return render_template('register.html')
 
+
 def show_registered_customers():
     with shelve.open('customer_db', 'r') as db:
         with open('registered_customers.txt', 'w') as file:
@@ -65,8 +72,10 @@ def show_registered_customers():
                 file.write(f"Customer: {key}")
                 file.write(str(db[key]) + "\n")
 
+
 # Call this function to display registered customers
 show_registered_customers()
+
 
 @app.route('/userLogin', methods=['GET', 'POST'])
 def user_login():
@@ -79,6 +88,7 @@ def user_login():
         else:
             return 'Login Failed. Invalid credentials.'
     return render_template('userLogin.html')
+
 
 # Route for staff to log in
 @app.route('/adminLogin', methods=['GET', 'POST'])
@@ -118,6 +128,7 @@ def admin_login():
             return redirect('/adminLogin')
 
     return render_template('adminLogin.html')
+
 
 # Route for staff to change their password
 @app.route('/change_password', methods=['GET', 'POST'])
@@ -178,6 +189,7 @@ def change_password():
                     return redirect('/change_password')
     return render_template('change_password.html')
 
+
 @app.route('/check_current_password', methods=['POST'])
 def check_current_password():
     current_password = request.get_json().get('current_password', '')
@@ -198,6 +210,8 @@ def check_current_password():
             return jsonify(success=True)
 
     return jsonify(success=False)
+
+
 @app.route('/shop')
 def shop():
     products_dict = {}
@@ -217,9 +231,11 @@ def cart():
 
     return render_template('cart.html')
 
+
 # Open the shelve file for staff profiles
 def open_staff_db():
     return shelve.open('staff_db')
+
 
 # Retrieve staff data from the shelve file
 def get_staff_data():
@@ -228,11 +244,13 @@ def get_staff_data():
             db['staff_data'] = []  # Initialize staff_data if not present in the shelve file
         return db['staff_data']
 
+
 # Display staff profiles
 @app.route('/staff_profile')
 def staff_profiles():
     staff_data = get_staff_data()
     return render_template('staff_profile.html', staff_data=staff_data)
+
 
 # Update staff profile
 @app.route('/update_staff/<staff_id>', methods=['GET', 'POST'])
@@ -272,6 +290,7 @@ def update_staff(staff_id):
         # Handle the case where staff with the given ID is not found
         flash("Staff not found", "error")
         return redirect('/staff_profile')
+
 
 # Delete staff profile
 @app.route('/delete_staff/<staff_id>')
@@ -348,16 +367,19 @@ def order_details():
 
     return render_template('order_details.html', orders=order_data)
 
+
 @app.route('/generate_report/<month>')
 def generate_report(month):
     report = get_report_data(month)
     save_report(month, report)
     return render_template('report.html', report=report)
 
+
 @app.route('/view_report/<month>')
 def view_report(month):
     report = load_report(month)
     return render_template('report.html', report=report)
+
 
 @app.route('/report')
 def report():
@@ -371,8 +393,10 @@ def report():
 
     return render_template('report.html', report=report_data)
 
+
 # Set the upload folder outside of the route function
 # app.config['UPLOAD_FOLDER'] = 'product_images'
+
 
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
@@ -407,6 +431,7 @@ def add_product():
         return redirect(url_for('manage_inventory'))
     return render_template('addProduct.html')
 
+
 @app.route('/manageInventory')
 def manage_inventory():
     products_dict = {}
@@ -432,6 +457,7 @@ def upload_file():
         return 'File uploaded successfully'
     return 'No file uploaded'
 '''
+
 
 @app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
 def update_product(id):
@@ -483,6 +509,7 @@ def update_product(id):
         return render_template('updateProduct.html', product_name_data=product_name_data,
                                category_data=category_data, stock_data=stock_data,
                                price_data=price_data, description_data=description_data)
+
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])
 def delete_product(id):
@@ -562,82 +589,56 @@ def delete_comment_by_index(index):
             db['comments'] = comments
 
 
-pts = {
-        'customer1': {'points_collected': 100, 'points_redeemed': 50, 'points_left': 50},
-        'customer2': {'points_collected': 150, 'points_redeemed': 30, 'points_left': 120},
-    }
-
-
 @app.route('/pointSystem')
 def point_system():
-    points_data = []
+    points_dict = {}
+    db = shelve.open('points.db', 'r')
+    points_dict = db['Points']
+    db.close()
 
-    for cust_id, points_info in pts.items():
-        points_data.append({
-            'cust_id': cust_id,
-            'pts_collected': points_info['points_collected'],
-            'pts_redeemed': points_info['points_redeemed'],
-            'pts_left': points_info['points_left']
-        })
+    points_list = []
+    for key in points_dict:
+        points = points_dict[key]
+        points_list.append(points)
 
-    return render_template('pointSystem.html', pts=points_data)
+    return render_template('pointSystem.html', count=len(points_list), points_list=points_list)
 
 
 @app.route('/edit_points/<string:cust_id>', methods=['GET', 'POST'])
 def edit_points(cust_id):
-    if request.method == 'GET':
-        # Retrieve customer details based on cust_id and render an edit form
-        # Example: customer = get_customer_details(cust_id)
-        customer_points = pts.get(cust_id, {'points_collected': 0, 'points_redeemed': 0, 'points_left': 0})
-        return render_template('edit_points.html', cust_id=cust_id, customer_points=customer_points)
-    elif request.method == 'POST':
-        # Handle the form submission to update points
-        new_points_collected = int(request.form['new_points_collected'])
-        new_points_redeemed = int(request.form['new_points_redeemed'])
-        new_points_left = int(request.form['new_points_left'])
 
-        # Update the customer points
-        pts[cust_id]['points_collected'] = new_points_collected
-        pts[cust_id]['points_redeemed'] = new_points_redeemed
-        pts[cust_id]['points_left'] = new_points_left
-
-        return redirect(url_for('point_system'))
+    return render_template('edit_points.html')
 
 
 @app.route('/delete_points/<string:cust_id>', methods=['GET', 'POST'])
 def delete_points(cust_id):
-    if request.method == 'GET':
-        # Display the delete confirmation template
-        return render_template('delete_points.html', cust_id=cust_id)
-    elif request.method == 'POST':
-        # Handle the deletion of customer points
-        if cust_id in pts:
-            del pts[cust_id]
-        return redirect(url_for('point_system'))
+
+    return render_template('delete_points.html', cust_id=cust_id)
 
 
 @app.route('/add_cus_ptss', methods=['GET', 'POST'])
 def add_cus_ptss():
-    if request.method == 'POST':
-        # Get the form data
-        new_cust_id = request.form['new_cust_id']
-        new_points_collected = request.form['new_points_collected']
-        new_points_redeemed = request.form['new_points_redeemed']
-        new_points_left = request.form['new_points_left']
+    add_cus_pts_form = CreatePointForm(request.form)
+    if request.method == "POST" and add_cus_pts_form.validate():
+        add_pts_dict = {}
+        db = shelve.open('points.db', 'c')
+        try:
+            add_pts_dict = db['Points']
+        except:
+            print("Error in retrieving points from points.db")
 
-        # Perform any necessary logic, such as database operations
-        # For simplicity, let's just print the new customer ID
-        pts[new_cust_id] = {
-            'points_collected': new_points_collected,
-            'points_redeemed': new_points_redeemed,
-            'points_left': new_points_left,
-        }
+        points = Points(
+            pts_collected=add_cus_pts_form.pts_collected.data,
+            pts_redeemed=add_cus_pts_form.pts_redeemed.data,
+            pts_left=add_cus_pts_form.pts_left.data)
 
-        # Redirect to a success page or return a response
+        add_pts_dict[points.get_customer_id()] = points
+        db['Points'] = add_pts_dict
+
+        db.close()
+
         return redirect(url_for('point_system'))
-
-    # If it's a GET request, render the form page
-    return render_template('add_cus_ptss.html')
+    return render_template('add_cus_ptss.html', form=add_cus_pts_form)
 
 
 if __name__ == '__main__':
