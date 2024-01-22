@@ -3,11 +3,14 @@
 
 {% block content %}
 <style>
+    h3 {text-align: center;
+    }
     .container {
         width:10%;
         float: left;
-
+        position:sticky;
     }
+
     .container2{
         width:89%;
         float: right;
@@ -15,6 +18,15 @@
         border-radius: 5px;
         background-color: rgba(211, 211, 211, 0.1);
         }
+    a {
+    text-decoration: none;
+    color: black;
+    opacity: 0.9;
+    }
+    a:hover {
+    color: black;
+    opacity: 0.6;
+    }
     div {
         border: 0px red solid;
     }
@@ -48,15 +60,16 @@
 
         }
 </style>
-<h1>Shop</h1>
+<h3 class="mt-2 mb-2">Welcome to our shop</h3>
 <div class="container">
     <div class="category">
         <h5>Categories</h5>
-        <a href="#">Cat 1</a><br>
-        <a href="#">Cat 2</a><br>
-        <a href="#">Cat 3</a><br>
+        <a href="#">Coaster</a><br>
+        <a href="#">Pouch</a><br>
+        <a href="#">Tote bag</a><br>
     </div>
 </div>
+<h5>&nbsp;&nbsp;&nbsp;Products</h5>
 <div class="container2">
     <div class="item">
         {% for product in products_list %}
@@ -90,7 +103,7 @@
                 <div class="mt-auto">
                     <div class="row">
                         <div class="col-sm-3">
-                            <button class="btn btn-warning add-to-cart" data-product-id="{{ product.get_product_id() }}">Add to Cart</button>
+                            <button class="btn btn-danger add-to-cart" data-product-id="{{ product.get_product_id() }}">Add to Cart</button>
                         </div>
                         <div class="col-sm-3">
                             <a href="/payment/{{product.get_product_id()}}" class="btn btn-danger">Buy Now</a>

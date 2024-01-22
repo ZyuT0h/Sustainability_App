@@ -27,11 +27,11 @@
 <form action="" method="POST" enctype="multipart/form-data">
     <div class="mb-3 form-control">
         <label for="productName">Product name:</label><br>
-        <input type="text" id="productName" name="productName"><br>
+        <input type="text" id="productName" name="productName" required><br>
     </div>
     <div class="mb-3 form-control">
         <label for="productImage">Product Image:</label><br>
-        <input type= "file" id="productImage" name="productImage"/>
+        <input type= "file" id="productImage" name="productImage" required>
     </div>
     <div class="mb-3 form-control">
         <label for="category">Category:</label>
@@ -43,14 +43,14 @@
     </div>
     <div class="mb-3 form-control">
         <label for="price">Price:</label><br>
-        <input type="text" id="price" name="price" required><br>
+        <input type="number" id="price" name="price" required><br>
     </div>
     <div class="mb-3 form-control">
         <label for="stock">Stock:</label><br>
-        <input type="number" id="stock" name="stock"><br>
+        <input type="number" id="stock" name="stock" min="1" required><br>
     </div>
     <div class="mb-3 form-control">
-        <textarea name="description" rows="10" cols="30"></textarea>
+        <textarea name="description" rows="10" cols="30" required></textarea>
     </div>
     <div class="mb-3 form-control">
         <input type="submit" value="Submit" class="btn btn-primary"/>

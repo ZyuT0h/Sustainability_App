@@ -24,7 +24,7 @@
     }
 </style>
 <form action="" method="POST">
-    <div class="container mt-2  ">
+    <div class="container mt-2">
         <h3 class="display-4">Update Product Details</h3>
         <div class="mb-3 form-control">
             <label for="productName">Product name:</label><br>
@@ -32,7 +32,7 @@
         </div>
         <div class="mb-3 form-control">
             <label for="productImage">Product Image:</label><br>
-            <input type= "file" id="productImage" name="productImage" value="{[ product_image_data }}"><br>
+            <input type= "file" id="productImage" name="productImage" value="{[ product_image_data }}" required><br>
         </div>
         <div class="mb-3 form-control">
             <label for="category">Category:</label>
@@ -44,14 +44,14 @@
         </div>
         <div class="mb-3 form-control">
             <label for="price">Price:</label><br>
-            <input type="text" id="price" name="price" value="{{ price_data }}"><br>
+            <input type="text" id="price" name="price" value="{{ price_data }}" required><br>
         </div>
         <div class="mb-3 form-control">
             <label for="stock">Stock:</label><br>
-            <input type="number" id="stock" name="stock" value="{{ stock_data }}"><br>
+            <input type="number" id="stock" name="stock" value="{{ stock_data }}" required><br>
         </div>
         <div class="mb-3 form-control">
-            <textarea name="description" rows="10" cols="30">{{ description_data }}</textarea>
+            <textarea name="description" rows="10" cols="30" required>{{ description_data }}</textarea>
         </div>
         <div class="mb-3 form-control">
             <input type="submit" value="Submit" class="btn btn-primary"/>
