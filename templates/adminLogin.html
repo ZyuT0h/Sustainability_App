@@ -2,30 +2,35 @@
 {% block title %}Library Loan System - Admin Login{% endblock %}
 
 {% block content %}
-<h1 class="display-4">Login as admin</h1>
-<form action="/adminLogin" method="post" id="loginForm">
-    <label for="staff_email">Staff Email:</label><br>
-    <input type="email" id="staff_email" name="email" required><br><br>
+<div class="container">
+  <div class="login-container">
+    <h1 class="display-4">Admin Login</h1>
+    <form action="/adminLogin" method="post" id="loginForm">
+        <label for="staff_email">Staff Email:</label><br>
+        <input type="email" id="staff_email" name="email" required><br><br>
 
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
 
-    <!-- Flash message for password change prompt (if needed) -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            {% if category == 'password_change_prompt' %}
-                <div class="alert alert-warning">
-                    {{ message }}
-                </div>
-            {% endif %}
-            {% if category == 'error' %}
-                <div class="alert alert-danger">
-                    {{ message }}
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endwith %}
+        <!-- Flash message for password change prompt (if needed) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                {% if category == 'password_change_prompt' %}
+                    <div class="alert alert-warning">
+                        {{ message }}
+                    </div>
+                {% endif %}
+                {% if category == 'error' %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
 
-    <button type="submit" class="btn btn-warning">LOGIN</button>
-</form>
+        <button type="submit" class="btn btn-warning">LOGIN</button>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
