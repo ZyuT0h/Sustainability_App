@@ -444,7 +444,7 @@ def set_session(id):
             'quantity': 1
         }
         session['cart'] = cart  # Corrected this line
-        db.close
+        db.close()
         return f'Session set successfully for product ID {id}'
     else:
         return f'Product with ID {id} not found'
@@ -654,17 +654,44 @@ def point_system():
 
 @app.route('/edit_points/<int:cust_id>', methods=['GET', 'POST'])
 def edit_points(cust_id):
-    edit_points_form = CreatePointForm(request.form)
-    if request.method == "POST" and edit_points_form.validate():
+    if request.method == "POST":
+        # retrieve  data
+        pts_collected_str = request.form['pts_collected']
+        pts_redeemed_str = request.form['pts_redeemed']
+        pts_left_str = request.form['pts_left']
+
+        try:
+            pts_collected = int(pts_collected_str)
+            pts_redeemed = int(pts_redeemed_str)
+            pts_left = int(pts_left_str)
+        except ValueError:
+            return render_template('edit_points.html', error="Please enter numerical values for all fields.",
+                                   cust_id=cust_id, pts_collected=pts_collected_str,
+                                   pts_redeemed=pts_redeemed_str, pts_left=pts_left_str)
+        # validations
+        if pts_collected < 0:
+            return render_template('edit_points.html', error="Points collected cannot be negative.",
+                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
+                                    pts_left=pts_left_str)
+        if pts_redeemed < 0:
+            return render_template('edit_points.html', error="Points redeemed cannot be negative.",
+                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
+                                    pts_left=pts_left_str)
+        if pts_left < 0:
+            return render_template('edit_points.html', error="Points left cannot be negative.",
+                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
+                                    pts_left=pts_left_str)
+
+        # update data
         points_dict = {}
         db = shelve.open('points.db', writeback=True)
         points_dict = db['Points']
 
         rpoints = points_dict.get(cust_id)
-        rpoints.set_customer_id(edit_points_form.cust_id.data)
-        rpoints.set_pts_collected(edit_points_form.pts_collected.data)
-        rpoints.set_pts_redeemed(edit_points_form.pts_redeemed.data)
-        rpoints.set_pts_left(edit_points_form.pts_left.data)
+
+        rpoints.set_pts_collected(pts_collected)
+        rpoints.set_pts_redeemed(pts_redeemed)
+        rpoints.set_pts_left(pts_left)
 
         db['Points'] = points_dict
         db.close()
@@ -677,12 +704,10 @@ def edit_points(cust_id):
         db.close()
 
         rpoints = points_dict.get(cust_id)
-        edit_points_form.cust_id.data = rpoints.get_customer_id()
-        edit_points_form.pts_collected.data = rpoints.get_pts_collected()
-        edit_points_form.pts_redeemed.data = rpoints.get_pts_redeemed()
-        edit_points_form.pts_left.data = rpoints.get_pts_left()
 
-        return render_template('edit_points.html', form=edit_points_form)
+        return render_template('edit_points.html', cust_id=cust_id, edited_cust_id=cust_id,
+                               pts_collected=rpoints.get_pts_collected(), pts_redeemed=rpoints.get_pts_redeemed(),
+                               pts_left=rpoints.get_pts_left())
 
 
 @app.route('/delete_points/<int:cust_id>', methods=['POST'])
