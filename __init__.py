@@ -342,7 +342,6 @@ def order_details():
             'customer_id': customer_id,
             'order_quantity': order_info['order_quantity'],
             'total_spending': order_info['total_spending'],
-            'order_status': order_info['order_status']
         })
 
     return render_template('order_details.html', orders=order_data)
