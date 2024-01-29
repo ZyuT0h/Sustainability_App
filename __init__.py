@@ -333,7 +333,7 @@ orders = {
 }
 
 
-@app.route('/order_details') mm
+@app.route('/order_details')
 def order_details():
     order_data = []
 
