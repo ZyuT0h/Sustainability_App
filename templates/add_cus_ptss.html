@@ -4,7 +4,71 @@
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %}
 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa; /* Set a light background color */
+    }
+
+    .display-4 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      width: 70%;
+      margin: 0 auto;
+      background-color: #ffffff; /* Set a white background for the form */
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+      border-radius: 8px; /* Add rounded corners */
+    }
+
+    label {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ced4da; /* Add a border with a light gray color */
+      border-radius: 4px; /* Add rounded corners */
+      margin-top: 6px;
+    }
+
+    input[type="submit"] {
+      background-color: #007bff; /* Set a primary button color */
+      color: #ffffff; /* Set text color for the button */
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0056b3; /* Change button color on hover */
+    }
+
+    .alert {
+      margin-top: 20px;
+    }
+  </style>
+
 <h1 class="display-4">Add Customer's Points</h1>
+
+{% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+{% endif %}
 
 <form method="POST" action="">
 <div class="form-group">

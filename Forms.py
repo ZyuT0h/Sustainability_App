@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, SelectField, TextAreaField, validators
+from wtforms import Form, StringField, IntegerField, SelectField, TextAreaField, validators
 from wtforms.fields import EmailField, DateField
 
 
@@ -15,6 +15,6 @@ class CreateProductForm(Form):
 
 class CreatePointForm(Form):
     cust_id = StringField('Customer ID: ', validators=[validators.DataRequired()])
-    pts_collected = StringField('Points Collected: ', validators=[validators.DataRequired()])
-    pts_redeemed = StringField('Points Redeemed', validators=[validators.DataRequired()])
-    pts_left = StringField('Points Left', validators=[validators.DataRequired()])
+    pts_collected = IntegerField('Points Collected: ', validators=[validators.DataRequired()])
+    pts_redeemed = IntegerField('Points Redeemed', validators=[validators.DataRequired()])
+    pts_left = IntegerField('Points Left', validators=[validators.DataRequired()])

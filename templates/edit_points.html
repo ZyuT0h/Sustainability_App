@@ -2,23 +2,131 @@
 {% block title %}Admin - Edit customer points{% endblock %}
 
 {% block content %}
-{% from "includes/_formHelper.html" import render_field %}
-
 <h1 class="display-4">Edit Customer's Points</h1>
 
+{% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+{% endif %}
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa; /* Set a light background color */
+    }
+
+    .display-4 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      width: 70%;
+      margin: 0 auto;
+      background-color: #ffffff; /* Set a white background for the form */
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+      border-radius: 8px; /* Add rounded corners */
+    }
+
+    label {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"],
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ced4da; /* Add a border with a light gray color */
+      border-radius: 4px; /* Add rounded corners */
+      margin-top: 6px;
+    }
+
+    input[type="submit"] {
+      background-color: #007bff; /* Set a primary button color */
+      color: #ffffff; /* Set text color for the button */
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0056b3; /* Change button color on hover */
+    }
+
+    .alert {
+      margin-top: 20px;
+    }
+  </style>
+
 <form method="POST" action="">
-<div class="form-group">
-{{ render_field(form.cust_id, class="form-control") }}
-</div>
-<div class="form-group">
-{{ render_field(form.pts_collected, class="form-control") }}
-</div>
-<div class="form-group">
-{{ render_field(form.pts_redeemed, class="form-control") }}
-</div>
-<div class="form-group">
-{{ render_field(form.pts_left, class="form-control") }}
-</div>
-<input type="submit" value="Submit" class="btn btn-primary"/>
+    <div class="form-control">
+        <div class="form-group ">
+            <label for="cust_id">Customer ID:</label>
+            <input type="text" name="cust_id" id="cust_id" class="form-control" value="{{ cust_id }}" readonly>
+        </div>
+        <div class="form-group">
+            <label for="pts_collected">Points Collected:</label>
+            <input type="text" name="pts_collected" id="pts_collected" class="form-control" value="{{ pts_collected }}">
+        </div>
+        <div class="form-group">
+            <label for="pts_redeemed">Points Redeemed:</label>
+            <input type="text" name="pts_redeemed" id="pts_redeemed" class="form-control" value="{{ pts_redeemed }}">
+        </div>
+        <div class="form-group">
+            <label for="pts_left">Points Left:</label>
+            <input type="text" name="pts_left" id="pts_left" class="form-control" value="{{ pts_left }}">
+        </div>
+        <input type="submit" value="Submit" class="btn btn-primary"/>
+    </div>
 </form>
+
+<script>
+    function validateForm() {
+        var ptsCollected = document.getElementById("pts_collected").value;
+        var ptsRedeemed = document.getElementById("pts_redeemed").value;
+        var ptsLeft = document.getElementById("pts_left").value;
+
+        var collectedError = document.getElementById("collectedError");
+        var redeemedError = document.getElementById("redeemedError");
+        var leftError = document.getElementById("leftError");
+        var submitButton = document.getElementById("submitButton");
+
+        // Validate numeric values
+        if (isNaN(ptsCollected) || ptsCollected < 0) {
+            collectedError.innerHTML = "Please enter a valid positive number.";
+            submitButton.disabled = true;
+        } else {
+            collectedError.innerHTML = "";
+        }
+
+        if (isNaN(ptsRedeemed) || ptsRedeemed < 0) {
+            redeemedError.innerHTML = "Please enter a valid positive number.";
+            submitButton.disabled = true;
+        } else {
+            redeemedError.innerHTML = "";
+        }
+
+        if (isNaN(ptsLeft) || ptsLeft < 0) {
+            leftError.innerHTML = "Please enter a valid positive number.";
+            submitButton.disabled = true;
+        } else {
+            leftError.innerHTML = "";
+        }
+
+        // Enable or disable submit button based on validation
+        if (collectedError.innerHTML === "" && redeemedError.innerHTML === "" && leftError.innerHTML === "") {
+            submitButton.disabled = false;
+        }
+    }
+</script>
 {% endblock %}
