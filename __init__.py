@@ -20,6 +20,8 @@ app.secret_key = 'something'
 def home():
     return render_template('home.html')
 
+def about():
+    return render_template('about.html')
 
 @app.route('/homeUser')
 def home_user():
