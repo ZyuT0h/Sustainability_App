@@ -46,6 +46,10 @@
         margin-top: 20px;
         align-self: flex-start;
     }
+
+    .status-dropdown {
+        width: 120px;
+    }
 </style>
 
 <div class="container">
@@ -66,7 +70,12 @@
                         <td>{{ order['customer_id'] }}</td>
                         <td>{{ order['order_quantity'] }}</td>
                         <td>{{ order['total_spending'] }}</td>
-                        <td>{{ order['order_status'] }}</td>
+                        <td style="background-color: #343a40; color: #fff;">
+                            <select class="status-dropdown">
+                                <option value="completed" {% if order['order_status'] == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="pending" {% if order['order_status'] == 'pending' %}selected{% endif %}>Pending</option>
+                            </select>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
