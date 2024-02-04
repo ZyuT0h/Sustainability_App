@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from werkzeug.utils import secure_filename
 import os
 from Product import Product
+from Cart import Cart
 from datetime import datetime, timedelta
 from report import MonthlyReport, get_report_data, save_report, load_report
 from Forms import CreatePointForm
@@ -394,69 +395,67 @@ def shop():
 
 @app.route('/cart')
 def cart():
-
-    return render_template('cart.html')
+    cart_items = session.get('cart', {})
+    total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
+    return render_template('cart.html', cart_items=cart_items, total_price=total_price)
 
 
 @app.route('/add_to_cart/<int:id>', methods=['POST'])
 def add_to_cart(id):
-    products_dict = {}
-    db = shelve.open('product.db', 'r')
-    products_dict = db['Products']
-    db.close()  # Close the shelve database
+    try:
+        print(type(id))
 
-    product = products_dict.get(id)
-
-    # Get the current cart from the session or create an empty cart
-    cart = session.get('cart', {})
-
-    if product:
-        # Add the product to the cart or update the quantity if it's already in the cart
-        if id in cart:
-            cart[id]['quantity'] += 1
-        else:
-            cart[id] = {
-                'product_id': id,
-                'product_name': product.product_name,
-                'price': product.price,
-                'quantity': 1
-            }
-
-        # Update the cart in the session
-        session['cart'] = cart
-
-        return redirect(url_for('shop'))  # Corrected this line
-    else:
-        return 'Product not found'
-
-@app.route('/set_session/<int:id>')
-def set_session(id):
-    products_dict = {}
-    db = shelve.open('product.db', 'r')
-    products_dict = db['Products']
-
-    cart = session.get('cart', {})
-    product = products_dict.get(id)
-    if product:
-        cart[id] = {
-            'product_id': id,
-            'product_name': product.get('product_name'),
-            'price': product.get('price'),
-            'quantity': 1
-        }
-        session['cart'] = cart  # Corrected this line
+        products_dict = {}
+        db = shelve.open('product.db', 'r')
+        products_dict = db['Products']
         db.close()
-        return f'Session set successfully for product ID {id}'
-    else:
-        return f'Product with ID {id} not found'
 
-@app.route('/get_session')
-def get_session():
-    if 'cart' in session:
-        cart = session['cart']
-        return f'The value in session is: {cart}'
-    else:
-        return 'No value in session'
+        print('Products Dictionary:', products_dict)  # Debug print
+
+        product = products_dict.get(int(id))
+        print('Retrieved product:', product)  # Add this line
+
+        print('Session:', session['cart'])
+        # Print the types of values in the cart
+
+        if product is not None:
+            if 'cart' not in session:
+                session['cart'] = {}
+                print('Cart session created')
+
+                # Print the session data to debug
+                print('Session:', session['cart'])
+
+            # Add the product to the cart
+            cart = session['cart']
+            print('Cart session retrieved:', cart)
+            # Print the types of values in the cart
+
+            if str(id) in cart:
+                cart[str(id)]['quantity'] += 1
+                print(f'Cart item {int(id)} +1')
+            else:
+                cart[str(id)] = {
+                    'name': product.get_product_name(),
+                    'price': float(product.get_price()), # Ensure price is converted to float
+                    'quantity': 1
+                }
+                print('New Cart item added')
+
+            # Update the session cart
+            session['cart'] = cart
+
+            print('Cart content:', session['cart'])  # Print cart content for debugging
+
+        else:
+            print(f'Error: Product with ID {int(id)} not found')
+
+        print('Cart content:', session['cart'])
+
+    except Exception as e:
+        print('Error:', e)  # Print any exceptions that occur
+
+    return redirect(url_for('cart'))
 
 
 @app.route('/addProduct', methods=['GET', 'POST'])

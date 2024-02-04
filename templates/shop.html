@@ -77,6 +77,7 @@
 <div class="container2">
     <div class="item">
         {% for product in products_list %}
+        <form action="/add_to_cart/{{ product.get_product_id() }}" method="POST">
         <div class="row mb-3 mt-3">
             <div class="col-sm-4">
                  <div class="img-fluid-container">
@@ -107,7 +108,7 @@
                 <div class="mt-auto">
                     <div class="row">
                         <div class="col-sm-3">
-                            <button class="btn btn-danger add-to-cart" data-product-id="{{ product.get_product_id() }}">Add to Cart</button>
+                            <button type="submit" class="btn btn-danger add-to-cart" data-product-id="{{ product.get_product_id() }}">Add to Cart</button>
                         </div>
                         <div class="col-sm-3">
                             <a href="/payment/{{product.get_product_id()}}" class="btn btn-danger">Buy Now</a>
@@ -118,6 +119,7 @@
                 </div>
             </div>
         </div>
+        </form>
         {% endfor %}
     </div>
 </div>

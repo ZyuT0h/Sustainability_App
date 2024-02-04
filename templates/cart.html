@@ -3,6 +3,11 @@
 
 {% block content %}
 
-  <h1>Cart</h1>
-
+<h1>Cart</h1>
+<ul>
+  {% for product_id, item in cart_items.items() %}
+    <li>{{ item.name }} - Quantity: {{ item.quantity }} - Price: ${{ '%.2f'|format(item.price | float) }}</li>
+  {% endfor %}
+</ul>
+<p>Total Price: ${{ '%.2f'|format(total_price) }}</p>
 {% endblock %}
