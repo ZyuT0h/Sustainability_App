@@ -14,7 +14,7 @@ class CreateProductForm(Form):
 
 
 class CreatePointForm(Form):
-    cust_id = StringField('Customer ID: ', validators=[validators.DataRequired()])
+    cust_id = IntegerField('Customer ID: ', validators=[validators.DataRequired()])
     pts_collected = IntegerField('Points Collected: ', validators=[validators.DataRequired()])
     pts_redeemed = IntegerField('Points Redeemed', validators=[validators.DataRequired()])
     pts_left = IntegerField('Points Left', validators=[validators.DataRequired()])

@@ -415,6 +415,11 @@ def add_to_cart(id):
         product = products_dict.get(int(id))
         print('Retrieved product:', product)  # Add this line
 
+        print("session:", session.keys())
+
+        if 'cart' not in session:
+            session['cart'] = {}
+
         print('Session:', session['cart'])
         # Print the types of values in the cart
 
@@ -453,7 +458,7 @@ def add_to_cart(id):
         print('Cart content:', session['cart'])
 
     except Exception as e:
-        print('Error:', e)  # Print any exceptions that occur
+       print('Error:', e)  # Print any exceptions that occur
 
     return redirect(url_for('cart'))
 
