@@ -757,9 +757,27 @@ def add_cus_ptss():
     return render_template('add_cus_ptss.html', form=add_cus_pts_form)
 
 
-@app.route('/payment')
+@app.route('/payment', methods=['GET', 'POST'])
 def payment():
-    return render_template('payment.html')
+    cart_items = session.get('cart', {})
+    total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
+
+    if request.method == 'POST':
+        # Process the form submission
+        shipping_address = request.form['U_SA']
+        postal = request.form['U_P']
+        unit_no = request.form['U_UN']
+        card_number = request.form['U_CNO']
+        expiry_date = request.form['U_ED']
+        cvc = request.form['U_CVC']
+        card_name = request.form['U_CN']
+
+        # Process the payment (Integration with Payment Gateway)
+        # Code to process payment goes here
+
+        # Return a JSON response indicating success
+        return jsonify({'success': True, 'message': 'Payment successful!'})
+    return render_template('payment.html', cart_items=cart_items, total_price=total_price)
 
 
 if __name__ == '__main__':
