@@ -422,6 +422,7 @@ def add_to_cart(id):
         if 'cart' not in session:
             session['cart'] = {}
 
+        print(session)
         print('Session:', session['cart'])
         # Print the types of values in the cart
 
@@ -443,6 +444,7 @@ def add_to_cart(id):
                 print(f'Cart item {int(id)} +1')
             else:
                 cart[str(id)] = {
+                    'image': product.get_product_image(),
                     'name': product.get_product_name(),
                     'price': float(product.get_price()), # Ensure price is converted to float
                     'quantity': 1
@@ -453,6 +455,7 @@ def add_to_cart(id):
             session['cart'] = cart
 
             print('Cart content:', session['cart'])  # Print cart content for debugging
+            print(session)
 
         else:
             print(f'Error: Product with ID {int(id)} not found')
@@ -462,6 +465,34 @@ def add_to_cart(id):
     except Exception as e:
        print('Error:', e)  # Print any exceptions that occur
 
+    return redirect(url_for('cart'))
+
+@app.route('/remove_item_from_cart/<int:id>', methods=['POST'])
+def remove_item_from_cart(id):
+    cart = session['cart']
+
+    if str(id) in cart:
+        cart[str(id)]['quantity'] -= 1
+        if cart[str(id)]['quantity'] == 0:
+            del cart[str(id)]  # Remove the item from the cart if the quantity becomes zero
+
+    session['cart'] = cart
+    return redirect(url_for('cart'))
+
+@app.route('/add_item_to_cart/<int:id>', methods=['POST'])
+def add_item_to_cart(id):
+    cart = session['cart']
+
+    if str(id) in cart:
+        cart[str(id)]['quantity'] += 1
+
+    session['cart'] = cart
+
+    return redirect(url_for('cart'))
+
+@app.route('/clear_cart', methods=['POST'])
+def clear_cart():
+    session.pop('cart', None)
     return redirect(url_for('cart'))
 
 

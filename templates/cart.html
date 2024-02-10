@@ -2,12 +2,120 @@
 {% block title %}Library Loan System - Home{% endblock %}
 
 {% block content %}
+<style>
+     body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
 
-<h1>Cart</h1>
-<ul>
-  {% for product_id, item in cart_items.items() %}
-    <li>{{ item.name }} - Quantity: {{ item.quantity }} - Price: ${{ '%.2f'|format(item.price | float) }}</li>
-  {% endfor %}
-</ul>
-<p>Total Price: ${{ '%.2f'|format(total_price) }}</p>
+    .cart {
+        width: 70%;
+        margin: 0 auto;
+        background-color: #ffffff; /* Set a white background for the form */
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        border-radius: 8px; /* Add rounded corners */
+    }
+
+    img {
+      border-radius: 5px;
+    }
+
+    .quantity-control {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px green solid;
+    }
+
+    .quantity-minus {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2px;
+      height: 20px;
+      font-size: 20px;
+      border-radius: 100px;
+    }
+    .quantity-plus {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2px;
+      height: 20px;
+      font-size: 15px;
+      border-radius: 100px;
+    }
+
+    .cart-item, .row mb-3 mt-3, .col-sm-3, .img-fluid-container, .col-sm-2, p {
+      border: 1px solid red;
+    }
+
+
+</style>
+<div class="cart mt-4">
+  <h1>My cart</h1>
+  <hr>
+  <form action="/clear_cart" method="POST">
+    <button type="submit" class="btn btn-danger">Clear cart</button>
+  </form>
+  <div class="cart-list">
+    {% for product_id, item in cart_items.items() %}
+    <div class="cart-item">
+      <div class="row mb-3 mt-3">
+        <div class="col-sm-3">
+          <div class="img-fluid-container">
+            {% if item.image %}
+            <img src="{{ url_for('static', filename='product_images/' + item.image) }}" style="max-width: 200px; max-height: 200px;">
+            {% else %}
+            No Image
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-sm-3">
+          {{ item.name }}
+        </div>
+        <div class="col-sm-2">
+          Each
+        </div>
+        <div class="col-sm-2">
+          <div class="row quantity-control" style="justify-content: start;">
+            Quantity
+          </div>
+          <div class="row quantity-control">
+            <div class="col-sm-4">
+              <form action="/remove_item_from_cart/{{ product_id }}" method="POST">
+                <button type="submit" class="quantity-minus btn btn-danger">-</button>
+              </form>
+            </div>
+            <div class="col-sm-4">
+              {{ item.quantity }}
+            </div>
+            <div class="col-sm-4">
+              <form action="/add_item_to_cart/{{ product_id }}" method="POST">
+                <button type="submit" class="quantity-plus btn btn-danger">+</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          Price
+          <br>
+          ${{ '%.2f'|format(item.price | float) }}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <hr>
+  <p>Total Price: ${{ '%.2f'|format(total_price) }}</p>
+</div>
 {% endblock %}
+      <!--
+      <form action="/remove_item_from_cart/{{ product_id }}" method="POST">
+        <button type="submit" class="btn btn-danger">Remove</button>
+      </form>
+      <form action="/add_item_to_cart/{{ product_id }}" method="POST">
+        <button type="submit" class="btn btn-danger">Add</button>
+      </form>
+      --->
