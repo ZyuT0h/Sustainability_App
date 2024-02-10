@@ -89,9 +89,17 @@ def user_login():
         password = request.form['password']
 
         if email == 'user@example.com' and password == 'password':
-            return 'Login Successful!'
+            customer_id = get_customer_id(email)
+            if customer_id:
+                session['customer_id'] = customer_id
+                return redirect(url_for('homeUser'))
+            else:
+                flash('Failed to retrieve customer ID. Please try again.', 'error')
+                return redirect(url_for('userLogin'))
+
         else:
-            return 'Login Failed. Invalid credentials.'
+            flash('Login Failed. Invalid credentials.', 'error')
+            return redirect(url_for('userLogin'))
     return render_template('userLogin.html')
 
 
@@ -114,7 +122,7 @@ def admin_login():
             if stored_hashed_password and bcrypt.checkpw(entered_password.encode('utf-8'),
                                                          stored_hashed_password.encode('utf-8')):
                 # Passwords match - log the staff in
-                session['email'] = entered_email
+                session['staff_email'] = entered_email
 
                 if not password_changed:
                     # User has not changed the password, prompt them to change it
@@ -330,27 +338,25 @@ def register_staff():
 
     return render_template('register_staff.html')
 
-
-# Example orders dictionary (Replace this with your actual order storage)
-orders = {
-    'customer1': {'order_quantity': 5, 'total_spending': 100, 'order_status': 'Completed'},
-    'customer2': {'order_quantity': 8, 'total_spending': 200, 'order_status': 'Pending'},
-}
-
-
 @app.route('/order_details')
 def order_details():
-    order_data = []
+    # Retrieve order details from session
+    order_details = session.get('order_details')
+    print("Order details in session:", order_details)
 
-    for customer_id, order_info in orders.items():
-        order_data.append({
-            'customer_id': customer_id,
-            'order_quantity': order_info['order_quantity'],
-            'total_spending': order_info['total_spending'],
-        })
+    return render_template('order_details.html', order=[order_details])
+@app.route('/staff_details')
+def staff_details():
+    # Retrieve staff email from session
+    staff_email = session.get('staff_email')
 
-    return render_template('order_details.html', orders=order_data)
+    # Retrieve customer_id associated with staff_email from the database or wherever it's stored
+    customer_id = retrieve_customer_id(staff_email)  # Example function to retrieve customer_id
 
+    # Use customer_id to fetch and display relevant customer order details
+    order_details = retrieve_order_details(customer_id)  # Example function to retrieve order details
+
+    return render_template('staff_details.html', order_details=order_details)
 
 @app.route('/generate_report/<month>')
 def generate_report(month):
@@ -813,6 +819,16 @@ def add_cus_ptss():
 
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
+    # Log session data before setting customer_id
+    app.logger.info("Session data before setting customer_id: %s", session)
+
+    # Set customer_id in session
+    customer_id = session.get('customer_id')
+    app.logger.info("Customer ID retrieved from session: %s", customer_id)
+
+    # Log session data after setting customer_id
+    session['customer_id'] = customer_id
+    app.logger.info("Session data after setting customer_id: %s", session)
     cart_items = session.get('cart', {})
     total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
 
@@ -826,24 +842,22 @@ def payment():
         cvc = request.form['U_CVC']
         card_name = request.form['U_CN']
 
-        customer = {
-            'shipping_address': shipping_address,
-            'postal_code': postal,
-            'unit_number': unit_no,
-            'card_number': card_number,
-            'expiry_date': expiry_date,
-            'cvc': cvc,
-            'card_name': card_name
-        }
-        session['customer'] = customer
+        customer = session.get('customer')
 
-        # Return cart details and address details in the response
-        response_data = {
-            'cart_items': cart_items,
-            'total_price': total_price
-        }
-        return jsonify(response_data)
+        if customer:
+            shipping_address = customer['shipping_address']
+            postal_code = customer['postal_code']
+            unit_number = customer['unit_number']
+        else:
+            # Handle case when customer information is not found in session
+            # You can redirect to an error page or handle it as appropriate
+            return render_template('error.html', message="Customer information not found in session")
 
+        # Clear the cart or perform any other necessary updates
+        session.pop('cart', None)  # Clear cart after successful payment
+
+        # Return a JSON response indicating success
+        return jsonify({'success': True, 'message': 'Payment successful!'})
     return render_template('payment.html', cart_items=cart_items, total_price=total_price)
 
 
