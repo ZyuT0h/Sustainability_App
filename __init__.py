@@ -630,9 +630,11 @@ def submit_comment():
 
 
 def get_comments():
-    # Open the shelve file and retrieve comments
     with shelve.open('comments.db') as db:
         comments = db.get('comments', [])
+        for comment in comments:
+            replies = comment.get('replies', [])
+            comment['replies'] = replies
     return comments
 
 
@@ -641,6 +643,26 @@ def save_comment(username, subject, message):
     with shelve.open('comments.db') as db:
         comments = db.get('comments', [])
         comments.append({'username': username, 'subject': subject, 'message': message})
+        db['comments'] = comments
+
+
+@app.route('/submit_reply', methods=['POST'])
+def submit_reply():
+    data = request.get_json()
+    parent_comment_index = int(data['parent_comment_index'])
+    reply_message = data['reply_message']
+
+    add_reply(parent_comment_index, reply_message)
+
+    comments = get_comments()
+    response_data = {'status': 'success', 'comments': comments}
+    return jsonify(response_data)
+
+
+def add_reply(parent_comment_index, reply_message):
+    with shelve.open('comments.db') as db:
+        comments = db.get('comments', [])
+        comments[parent_comment_index].setdefault('replies', []).append(reply_message)
         db['comments'] = comments
 
 
@@ -804,8 +826,16 @@ def payment():
         cvc = request.form['U_CVC']
         card_name = request.form['U_CN']
 
-        # Process the payment (Integration with Payment Gateway)
-        # Code to process payment goes here
+        customer = session.get('customer')
+
+        if customer:
+            shipping_address = customer['shipping_address']
+            postal_code = customer['postal_code']
+            unit_number = customer['unit_number']
+        else:
+            # Handle case when customer information is not found in session
+            # You can redirect to an error page or handle it as appropriate
+            return render_template('error.html', message="Customer information not found in session")
 
         # Return a JSON response indicating success
         return jsonify({'success': True, 'message': 'Payment successful!'})
