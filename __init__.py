@@ -21,8 +21,10 @@ app.secret_key = 'something'
 def home():
     return render_template('home.html')
 
+
 def about():
     return render_template('about.html')
+
 
 @app.route('/homeUser')
 def home_user():
@@ -675,17 +677,17 @@ def edit_points(cust_id):
                                    pts_redeemed=pts_redeemed_str, pts_left=pts_left_str)
         # validations
         if pts_collected < 0:
-            return render_template('edit_points.html', error="Points collected cannot be negative.",
-                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
-                                    pts_left=pts_left_str)
+            return render_template('edit_points.html', error="Points collected cannot be negative.", cust_id=cust_id,
+                                   pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str, pts_left=pts_left_str
+                                   )
         if pts_redeemed < 0:
-            return render_template('edit_points.html', error="Points redeemed cannot be negative.",
-                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
-                                    pts_left=pts_left_str)
+            return render_template('edit_points.html', error="Points redeemed cannot be negative.", cust_id=cust_id,
+                                   pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str, pts_left=pts_left_str
+                                   )
         if pts_left < 0:
-            return render_template('edit_points.html', error="Points left cannot be negative.",
-                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
-                                    pts_left=pts_left_str)
+            return render_template('edit_points.html', error="Points left cannot be negative.", cust_id=cust_id,
+                                   pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str, pts_left=pts_left_str
+                                   )
 
         # update data
         points_dict = {}
@@ -745,8 +747,7 @@ def add_cus_ptss():
 
         points = Points(
             pts_collected=add_cus_pts_form.pts_collected.data,
-            pts_redeemed=add_cus_pts_form.pts_redeemed.data,
-            pts_left=add_cus_pts_form.pts_left.data)
+            pts_redeemed=add_cus_pts_form.pts_redeemed.data, pts_left=add_cus_pts_form.pts_left.data)
 
         add_pts_dict[points.get_customer_id()] = points
         db['Points'] = add_pts_dict
