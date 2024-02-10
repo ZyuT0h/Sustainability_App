@@ -1,24 +1,26 @@
 {% extends "/base/base_user.html" %}
-{% block title %}Library Loan System - Home{% endblock %}
+{% block title %}Payment{% endblock %}
 
 {% block content %}
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('#paymentForm').submit(function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Submit the form via AJAX
-        $.ajax({
-            type: 'POST',
-            url: '/payment',
-            data: $('#paymentForm').serialize(),
-            success: function(response) {
+    $('#address').change(function() {
+        if ($(this).is(':checked')) {
+            // Use default address
+            $('#U_SA').val('{{ session.get("shipping_address") }}');
+            $('#U_P').val('{{ session.get("postal_code") }}');
+            $('#U_UN').val('{{ session.get("unit_number") }}');
+        } else {
+            // Clear the address fields
+            $('#U_SA').val('');
+            $('#U_P').val('');
+            $('#U_UN').val('');
+        }
     });
 });
-
 </script>
-
 <style>
 
         .row {
@@ -92,19 +94,22 @@ $(document).ready(function() {
             <div class="form-container">
                 <form method="POST" action="">
                     <h3>Address details</h3>
-                    <div class="form-group">
-                        <label for="U_SA">Shipping Address:</label>
-                        <input type="text" id="U_SA" name="U_SA">
+                        <div class="form-group">
+                            <label for="U_SA">Shipping Address:</label>
+                            <input type="text" id="U_SA" name="U_SA">
+                        </div>
+                        <div class="grouping">
+                            <div class="form-group">
+                                <label for="U_P">Postal:</label>
+                                <input type="text" id="U_P" name="U_P">
+                            </div>
+                            <div class="form-group">
+                                <label for="U_UN">Unit No:</label>
+                                <input type="text" id="U_UN" name="U_UN">
+                            </div>
                     </div>
-                    <div class="grouping">
-                        <div class="form-group">
-                            <label for="U_P">Postal:</label>
-                            <input type="text" id="U_P" name="U_P">
-                        </div>
-                        <div class="form-group">
-                            <label for="U_UN">Unit No:</label>
-                            <input type="text" id="U_UN" name="U_UN">
-                        </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="address"><label for="address">use default address</label>
                     </div>
                     <hr>
                     <h3>Card details</h3>

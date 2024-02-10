@@ -21,8 +21,10 @@ app.secret_key = 'something'
 def home():
     return render_template('home.html')
 
+
 def about():
     return render_template('about.html')
+
 
 @app.route('/homeUser')
 def home_user():
@@ -34,7 +36,7 @@ def home_admin():
     return render_template('homeAdmin.html')
 
 
-# Open the shelve file in writeback mode for registratio
+# Open the shelve file in writeback mode for registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
         if request.method == 'POST':
@@ -426,6 +428,7 @@ def add_to_cart(id):
         if 'cart' not in session:
             session['cart'] = {}
 
+        print(session)
         print('Session:', session['cart'])
         # Print the types of values in the cart
 
@@ -447,6 +450,7 @@ def add_to_cart(id):
                 print(f'Cart item {int(id)} +1')
             else:
                 cart[str(id)] = {
+                    'image': product.get_product_image(),
                     'name': product.get_product_name(),
                     'price': float(product.get_price()), # Ensure price is converted to float
                     'quantity': 1
@@ -457,6 +461,7 @@ def add_to_cart(id):
             session['cart'] = cart
 
             print('Cart content:', session['cart'])  # Print cart content for debugging
+            print(session)
 
         else:
             print(f'Error: Product with ID {int(id)} not found')
@@ -466,6 +471,34 @@ def add_to_cart(id):
     except Exception as e:
        print('Error:', e)  # Print any exceptions that occur
 
+    return redirect(url_for('cart'))
+
+@app.route('/remove_item_from_cart/<int:id>', methods=['POST'])
+def remove_item_from_cart(id):
+    cart = session['cart']
+
+    if str(id) in cart:
+        cart[str(id)]['quantity'] -= 1
+        if cart[str(id)]['quantity'] == 0:
+            del cart[str(id)]  # Remove the item from the cart if the quantity becomes zero
+
+    session['cart'] = cart
+    return redirect(url_for('cart'))
+
+@app.route('/add_item_to_cart/<int:id>', methods=['POST'])
+def add_item_to_cart(id):
+    cart = session['cart']
+
+    if str(id) in cart:
+        cart[str(id)]['quantity'] += 1
+
+    session['cart'] = cart
+
+    return redirect(url_for('cart'))
+
+@app.route('/clear_cart', methods=['POST'])
+def clear_cart():
+    session.pop('cart', None)
     return redirect(url_for('cart'))
 
 
@@ -603,9 +636,11 @@ def submit_comment():
 
 
 def get_comments():
-    # Open the shelve file and retrieve comments
     with shelve.open('comments.db') as db:
         comments = db.get('comments', [])
+        for comment in comments:
+            replies = comment.get('replies', [])
+            comment['replies'] = replies
     return comments
 
 
@@ -614,6 +649,26 @@ def save_comment(username, subject, message):
     with shelve.open('comments.db') as db:
         comments = db.get('comments', [])
         comments.append({'username': username, 'subject': subject, 'message': message})
+        db['comments'] = comments
+
+
+@app.route('/submit_reply', methods=['POST'])
+def submit_reply():
+    data = request.get_json()
+    parent_comment_index = int(data['parent_comment_index'])
+    reply_message = data['reply_message']
+
+    add_reply(parent_comment_index, reply_message)
+
+    comments = get_comments()
+    response_data = {'status': 'success', 'comments': comments}
+    return jsonify(response_data)
+
+
+def add_reply(parent_comment_index, reply_message):
+    with shelve.open('comments.db') as db:
+        comments = db.get('comments', [])
+        comments[parent_comment_index].setdefault('replies', []).append(reply_message)
         db['comments'] = comments
 
 
@@ -681,17 +736,17 @@ def edit_points(cust_id):
                                    pts_redeemed=pts_redeemed_str, pts_left=pts_left_str)
         # validations
         if pts_collected < 0:
-            return render_template('edit_points.html', error="Points collected cannot be negative.",
-                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
-                                    pts_left=pts_left_str)
+            return render_template('edit_points.html', error="Points collected cannot be negative.", cust_id=cust_id,
+                                   pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str, pts_left=pts_left_str
+                                   )
         if pts_redeemed < 0:
-            return render_template('edit_points.html', error="Points redeemed cannot be negative.",
-                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
-                                    pts_left=pts_left_str)
+            return render_template('edit_points.html', error="Points redeemed cannot be negative.", cust_id=cust_id,
+                                   pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str, pts_left=pts_left_str
+                                   )
         if pts_left < 0:
-            return render_template('edit_points.html', error="Points left cannot be negative.",
-                                    cust_id=cust_id, pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str,
-                                    pts_left=pts_left_str)
+            return render_template('edit_points.html', error="Points left cannot be negative.", cust_id=cust_id,
+                                   pts_collected=pts_collected_str, pts_redeemed=pts_redeemed_str, pts_left=pts_left_str
+                                   )
 
         # update data
         points_dict = {}
@@ -751,8 +806,7 @@ def add_cus_ptss():
 
         points = Points(
             pts_collected=add_cus_pts_form.pts_collected.data,
-            pts_redeemed=add_cus_pts_form.pts_redeemed.data,
-            pts_left=add_cus_pts_form.pts_left.data)
+            pts_redeemed=add_cus_pts_form.pts_redeemed.data, pts_left=add_cus_pts_form.pts_left.data)
 
         add_pts_dict[points.get_customer_id()] = points
         db['Points'] = add_pts_dict
@@ -788,8 +842,16 @@ def payment():
         cvc = request.form['U_CVC']
         card_name = request.form['U_CN']
 
-        # Process the payment (Integration with Payment Gateway)
-        # Code to process payment goes here
+        customer = session.get('customer')
+
+        if customer:
+            shipping_address = customer['shipping_address']
+            postal_code = customer['postal_code']
+            unit_number = customer['unit_number']
+        else:
+            # Handle case when customer information is not found in session
+            # You can redirect to an error page or handle it as appropriate
+            return render_template('error.html', message="Customer information not found in session")
 
         # Clear the cart or perform any other necessary updates
         session.pop('cart', None)  # Clear cart after successful payment

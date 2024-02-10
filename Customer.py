@@ -48,11 +48,8 @@ class Customer:
 
 
 class Points(Customer):
-    def __init__(self, email, password, postalcode, address, unit_no, pts_collected, pts_redeemed, pts_left):
-        super().__init__(email, password, postalcode, address, unit_no)
-        self.pts_collected = pts_collected
-        self.pts_redeemed = pts_redeemed
-        self.pts_left = pts_left
+    def __init__(self, customer_id, pts_collected, pts_redeemed, pts_left):
+        super().__init__(customer_id, "", "", "", "")
         self.pts_collected = pts_collected
         self.pts_redeemed = pts_redeemed
         self.pts_left = pts_left
