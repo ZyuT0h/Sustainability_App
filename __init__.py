@@ -34,7 +34,7 @@ def home_admin():
     return render_template('homeAdmin.html')
 
 
-# Open the shelve file in writeback mode for registratio
+# Open the shelve file in writeback mode for registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
         if request.method == 'POST':
