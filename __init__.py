@@ -855,6 +855,9 @@ def payment():
 
         # Return cart details and address details in the response
         response_data = {
+            'shipping_address': shipping_address,
+            'postal_code': postal,
+            'unit_number': unit_no,
             'cart_items': cart_items,
             'total_price': total_price
         }
