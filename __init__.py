@@ -842,22 +842,24 @@ def payment():
         cvc = request.form['U_CVC']
         card_name = request.form['U_CN']
 
-        customer = session.get('customer')
+        customer = {
+            'shipping_address': shipping_address,
+            'postal_code': postal,
+            'unit_number': unit_no,
+            'card_number': card_number,
+            'expiry_date': expiry_date,
+            'cvc': cvc,
+            'card_name': card_name
+        }
+        session['customer'] = customer
 
-        if customer:
-            shipping_address = customer['shipping_address']
-            postal_code = customer['postal_code']
-            unit_number = customer['unit_number']
-        else:
-            # Handle case when customer information is not found in session
-            # You can redirect to an error page or handle it as appropriate
-            return render_template('error.html', message="Customer information not found in session")
+        # Return cart details and address details in the response
+        response_data = {
+            'cart_items': cart_items,
+            'total_price': total_price
+        }
+        return jsonify(response_data)
 
-        # Clear the cart or perform any other necessary updates
-        session.pop('cart', None)  # Clear cart after successful payment
-
-        # Return a JSON response indicating success
-        return jsonify({'success': True, 'message': 'Payment successful!'})
     return render_template('payment.html', cart_items=cart_items, total_price=total_price)
 
 
