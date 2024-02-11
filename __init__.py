@@ -906,5 +906,14 @@ def payment():
     return render_template('payment.html', cart_items=cart_items, total_price=total_price)
 
 
+@app.route('/receipt', methods=['GET'])
+def receipt():
+    # Get payment information from the URL parameter
+    payment_info = request.args.get('info', '')
+
+    # Render the receipt template with the payment information
+    return render_template('receipt.html', payment_info=payment_info)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
