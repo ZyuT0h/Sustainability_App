@@ -1,11 +1,23 @@
-# import shelve
+import shelve
 
 class Product:
-    count_id = 0
 
     def __init__(self, product_name, category, stock, price, description):
-        Product.count_id += 1
-        self.__product_id = Product.count_id
+        # Open the shelve storage
+        db = shelve.open('product_id_list.db', 'c')
+
+        # Retrieve the list of product IDs from the storage or initialize an empty list
+        product_id_list = db.get('ProductId', [])
+
+        # Start with an initial product ID of 1
+        count_id = 1
+        while count_id in product_id_list:
+            # If the count_id is in the list, increment it by 1
+            count_id += 1
+        self.__product_id = count_id
+        product_id_list.append(count_id)
+        db['ProductId'] = product_id_list
+        db.close()
         self.__product_name = product_name
         self.__product_image = None
         self.__category = category
