@@ -405,7 +405,8 @@ def shop():
 def cart():
     cart_items = session.get('cart', {})
     total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
-    return render_template('cart.html', cart_items=cart_items, total_price=total_price)
+    total_quantity = sum(item['quantity'] for item in cart_items.values())
+    return render_template('cart.html', cart_items=cart_items, total_price=total_price, total_quantity=total_quantity)
 
 
 @app.route('/add_to_cart/<int:id>', methods=['POST'])
@@ -447,13 +448,15 @@ def add_to_cart(id):
 
             if str(id) in cart:
                 cart[str(id)]['quantity'] += 1
+                cart[str(id)]['subtotal'] = cart[str(id)]['price'] * cart[str(id)]['quantity']
                 print(f'Cart item {int(id)} +1')
             else:
                 cart[str(id)] = {
                     'image': product.get_product_image(),
                     'name': product.get_product_name(),
                     'price': float(product.get_price()), # Ensure price is converted to float
-                    'quantity': 1
+                    'quantity': 1,
+                    'subtotal': float(product.get_price()) * 1
                 }
                 print('New Cart item added')
 
@@ -471,33 +474,60 @@ def add_to_cart(id):
     except Exception as e:
        print('Error:', e)  # Print any exceptions that occur
 
-    return redirect(url_for('cart'))
+    return redirect(url_for('shop'))
 
 @app.route('/remove_item_from_cart/<int:id>', methods=['POST'])
 def remove_item_from_cart(id):
-    cart = session['cart']
+    try:
+        cart = session['cart']
 
-    if str(id) in cart:
-        cart[str(id)]['quantity'] -= 1
-        if cart[str(id)]['quantity'] == 0:
-            del cart[str(id)]  # Remove the item from the cart if the quantity becomes zero
+        if str(id) in cart:
+            cart[str(id)]['quantity'] -= 1
+            cart[str(id)]['subtotal'] = cart[str(id)]['price'] * cart[str(id)]['quantity']
+            if cart[str(id)]['quantity'] == 0:
+                del cart[str(id)]  # Remove the item from the cart if the quantity becomes zero
 
-    session['cart'] = cart
-    return redirect(url_for('cart'))
+        session['cart'] = cart
+        return redirect(url_for('cart'))
+
+    except Exception as e:
+        print('Error:', e)
 
 @app.route('/add_item_to_cart/<int:id>', methods=['POST'])
 def add_item_to_cart(id):
-    cart = session['cart']
+    try:
+        cart = session['cart']
 
-    if str(id) in cart:
-        cart[str(id)]['quantity'] += 1
+        if str(id) in cart:
+            cart[str(id)]['quantity'] += 1
+            cart[str(id)]['subtotal'] = cart[str(id)]['price'] * cart[str(id)]['quantity']
 
-    session['cart'] = cart
+        session['cart'] = cart
 
-    return redirect(url_for('cart'))
+        return redirect(url_for('cart'))
 
-@app.route('/clear_cart', methods=['POST'])
-def clear_cart():
+    except Exception as e:
+        print('Error:', e)
+
+
+@app.route('/clear_item/<int:id>', methods=['POST'])
+def clear_item(id):
+    try:
+        cart = session.get('cart', {})
+
+        if str(id) in cart:
+            del cart[str(id)]  # Remove the specific item from the cart
+
+        session['cart'] = cart
+
+        return redirect(url_for('cart'))
+
+    except Exception as e:
+        print('Error:', e)
+
+
+@app.route('/empty_cart', methods=['POST'])
+def empty_cart():
     session.pop('cart', None)
     return redirect(url_for('cart'))
 
