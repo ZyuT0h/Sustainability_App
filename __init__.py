@@ -599,8 +599,8 @@ def update_product(id):
         description_data = product.get_description()
 
         return render_template('updateProduct.html', product_name_data=product_name_data,
-                               category_data=category_data, stock_data=stock_data,
-                               price_data=price_data, description_data=description_data)
+                               category_data=category_data, stock_data=stock_data, price_data=price_data,
+                               description_data=description_data)
 
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])
