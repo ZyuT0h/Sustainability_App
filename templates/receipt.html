@@ -1,0 +1,19 @@
+{% extends "/base/base_user.html" %}
+{% block title %}Receipt{% endblock %}
+
+{% block content %}
+
+    <h1>Payment Receipt</h1>
+    <div id="receipt-info">
+        <!-- Payment information will be displayed here -->
+    </div>
+
+    <script>
+        // Retrieve payment information from URL parameters
+        var urlParams = new URLSearchParams(window.location.search);
+        var receiptInfo = urlParams.get('info');
+
+        // Display payment information on the page
+        document.getElementById('receipt-info').innerHTML = receiptInfo;
+    </script>
+{% endblock %}

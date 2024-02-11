@@ -31,26 +31,25 @@ $(document).ready(function() {
             url: '/payment',
             data: $('#paymentForm').serialize(),
             success: function(response) {
-                // Show success message
-                alert("Payment successful!\n\n" +
-                    "Shipping Address: " + response.shipping_address + "\n" +
-                    "Postal Code: " + response.postal_code + "\n" +
-                    "Unit Number: " + response.unit_number + "\n" +
-                    // Add other fields as needed
-                    "\nCart Items:\n" + getCartItemsAsString(response.cart_items) +
-                    "\nTotal Price: $" + response.total_price
-                );
+                // Construct payment information string
+                var paymentInfo = "Payment successful!<br><br>" +
+                    "Shipping Address: " + response.shipping_address + "<br>" +
+                    "Postal Code: " + response.postal_code + "<br>" +
+                    "Unit Number: " + response.unit_number + "<br>" +
+                    "<br>Cart Items:<br>" + getCartItemsAsString(response.cart_items) +
+                    "<br>Total Price: $" + response.total_price;
 
-                // Optional: If you don't want the page to redirect after closing the alert
-                return false; // or event.preventDefault();
+                // Redirect to receipt page with payment information as URL parameter
+                window.location.href = '/receipt?info=' + encodeURIComponent(paymentInfo);
             },
             error: function(xhr, status, error) {
-                // Show error message
-                alert("Payment failed. Please try again later.");
+                // Redirect to error page
+                window.location.href = '/error.html';
             }
         });
     });
 });
+
 
 // Helper function to get cart items as string
 function getCartItemsAsString(cartItems) {
