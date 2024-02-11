@@ -842,24 +842,34 @@ def payment():
         cvc = request.form['U_CVC']
         card_name = request.form['U_CN']
 
-        customer = {
-            'shipping_address': shipping_address,
-            'postal_code': postal,
-            'unit_number': unit_no,
-            'card_number': card_number,
-            'expiry_date': expiry_date,
-            'cvc': cvc,
-            'card_name': card_name
-        }
-        session['customer'] = customer
+        total_price_formatted = '{:.2f}'.format(total_price)
 
-        # Return cart details and address details in the response
+        with shelve.open('customer.db') as db:
+            # Add the customer data to the database
+            db['customer'] = {
+                'shipping_address': shipping_address,
+                'postal_code': postal,
+                'unit_number': unit_no,
+                'card_number': card_number,
+                'expiry_date': expiry_date,
+                'cvc': cvc,
+                'card_name': card_name,
+                'total_price': total_price_formatted
+            }
+
+        with shelve.open('customer.db') as db:
+            # Retrieve customer data from the database
+            customer_data = db.get('customer', {})
+
+        # Construct response data using the retrieved customer data
         response_data = {
-            'shipping_address': shipping_address,
-            'postal_code': postal,
-            'unit_number': unit_no,
+            'shipping_address': customer_data.get('shipping_address', ''),
+            'postal_code': customer_data.get('postal_code', ''),
+            'unit_number': customer_data.get('unit_number', ''),
+            'card_name': customer_data.get('card_name', ''),
+            # Add other data as needed
             'cart_items': cart_items,
-            'total_price': total_price
+            'total_price': total_price_formatted
         }
         return jsonify(response_data)
 

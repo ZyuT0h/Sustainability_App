@@ -32,26 +32,17 @@ $(document).ready(function() {
             data: $('#paymentForm').serialize(),
             success: function(response) {
                 // Show success message
-                alert("Payment successful!");
+                alert("Payment successful!\n\n" +
+                    "Shipping Address: " + response.shipping_address + "\n" +
+                    "Postal Code: " + response.postal_code + "\n" +
+                    "Unit Number: " + response.unit_number + "\n" +
+                    // Add other fields as needed
+                    "\nCart Items:\n" + getCartItemsAsString(response.cart_items) +
+                    "\nTotal Price: $" + response.total_price
+                );
 
-                // Display cart items and total price
-                var cartItems = response.cart_items;
-                var totalPrice = response.total_price;
-
-                // Display cart items
-                var cartItemDetails = "Cart Items:\n";
-                for (var product_id in cartItems) {
-                    if (cartItems.hasOwnProperty(product_id)) {
-                        var item = cartItems[product_id];
-                        cartItemDetails += item.name + " - Quantity: " + item.quantity + " - Price: $" + item.price + "\n";
-                    }
-                }
-
-                // Display total price
-                cartItemDetails += "\nTotal Price: $" + totalPrice;
-
-                // Display cart items and total price in alert
-                alert(cartItemDetails);
+                // Optional: If you don't want the page to redirect after closing the alert
+                return false; // or event.preventDefault();
             },
             error: function(xhr, status, error) {
                 // Show error message
@@ -60,6 +51,18 @@ $(document).ready(function() {
         });
     });
 });
+
+// Helper function to get cart items as string
+function getCartItemsAsString(cartItems) {
+    var cartItemDetails = "";
+    for (var product_id in cartItems) {
+        if (cartItems.hasOwnProperty(product_id)) {
+            var item = cartItems[product_id];
+            cartItemDetails += item.name + " - Quantity: " + item.quantity + " - Price: $" + item.price + "\n";
+        }
+    }
+    return cartItemDetails;
+}
 </script>
 <style>
 
