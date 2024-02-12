@@ -1,5 +1,5 @@
 {% extends 'base/base_admin.html' %}
-{% block title %}Inventory Management{% endblock %}
+{% block title %}Admin Forum{% endblock %}
 
 {% block content %}
 <style>
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {% set comment_index = 0 %}
     {% for comment in comments %}
         <div class="comment-card">
-            <button class="delete-button" data-index="{{ comment_index }}">Delete</button>
+            <button class="delete-button" data-index="{{ comment_index }}">X</button>
             <h6>{{ comment.username }}</h6>
             <p>{{ comment.subject }}</p>
             <p>{{ comment.message }}</p>
