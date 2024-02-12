@@ -16,23 +16,66 @@
     position: relative;
     }
 
-    .delete-comment {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 5px;
-    padding: 5px 10px;
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    .comment-card {
+        background-color: #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        position: relative; /* Position for delete button */
+    }
+
+    .comment-card h6 {
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    .comment-card p {
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .comment-card .reply-form input[type="text"] {
+        width: calc(97% - 50px);
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .comment-card .reply-form button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .comment-card .reply-form button:hover {
+        background-color: #0056b3;
+    }
+
+    .delete-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 8px 18px;
+    }
+
+    h1 {
+        text-align: center;
     }
 
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const deleteButtons = document.querySelectorAll('.delete-comment');
+        const deleteButtons = document.querySelectorAll('.delete-button'); // Changed class name here
 
         deleteButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -115,31 +158,49 @@
         console.error('Error:', error);
     });
 }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const replies = document.querySelectorAll('.reply');
+
+        replies.forEach(reply => {
+            // Generate random color for each reply
+            const randomColor = getRandomColor();
+            reply.style.color = randomColor;
+        });
+    });
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
 </script>
 <fieldset>
     <br>
-    <h1>Forum</h1>
-    {% if admin %}
-        <hr>
-        {% for comment in comments %}
-            <div class="comment-container">
-                <button class="delete-comment" data-index="{{ loop.index - 1 }}">Delete</button>
-                {{ comment.username }}:<br>
-                {{ comment.subject }}<br>
-                {{ comment.message }}<br>
-                {% if comment.replies %}
-                    {% for reply in comment.replies %}
-                        &nbsp;&nbsp;Reply: {{ reply }}<br>
-                    {% endfor %}
-                {% endif %}
-                <form onsubmit="event.preventDefault(); submitReply({{ loop.index - 1 }});">
-                    <input type="text" id="reply{{ loop.index - 1 }}" placeholder="Reply...">
-                    <button type="submit">Reply</button>
-                </form>
-            </div>
-            <hr>
-        {% endfor %}
-    {% endif %}
+    <h1>Admin Forum</h1>
+    {% set comment_index = 0 %}
+    {% for comment in comments %}
+        <div class="comment-card">
+            <button class="delete-button" data-index="{{ comment_index }}"> x </button> <!-- Added data-index attribute -->
+            <h6>{{ comment.username }}</h6>
+            <p>{{ comment.subject }}</p>
+            <p>{{ comment.message }}</p>
+            {% if comment.replies %}
+                {% for reply in comment.replies %}
+                    <p class="reply">{{ reply }}</p>
+                {% endfor %}
+            {% endif %}
+            <form class="reply-form" onsubmit="event.preventDefault(); submitReply({{ comment_index }});">
+                <input type="text" id="reply{{ comment_index }}" placeholder="Reply...">
+                <button type="submit">Reply</button>
+            </form>
+        </div>
+        {% set comment_index = comment_index + 1 %}
+    {% endfor %}
 </fieldset>
 
 {% endblock %}

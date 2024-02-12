@@ -41,46 +41,35 @@
     .table-striped tbody tr:nth-of-type(even) td {
         background-color: #ffffff;
     }
-
-    .btn-success {
-        margin-top: 20px;
-        align-self: flex-start;
-    }
-
-    .status-dropdown {
-        width: 120px;
-    }
 </style>
-
 <div class="container">
     <h1 class="display-4">Customer Order Details</h1>
     <div class="table-container">
         <table class="table table-striped">
             <thead class="table-dark">
                 <tr>
-                    <th>Customer ID</th>
-                    <th>Order Quantity</th>
-                    <th>Total Spending</th>
+                    <th>Order ID</th>
+                    <th>Postal Code</th>
+                    <th>Shipping Address</th>
+                    <th>Unit Number</th>
                     <th>Order Status</th>
                 </tr>
             </thead>
             <tbody>
-                {% for order in orders %}
                     <tr>
-                        <td>{{ order_details['customer_id'] }}</td>
-                        <td>{{ order_details['order_quantity'] }}</td>
-                        <td>{{ order_details['total_spending'] }}</td>
-                        <td style="background-color: #343a40; color: #fff;">
+                        <td>{{ order_id }}</td>
+                        <td>{{ order.postal_code }}</td>
+                        <td>{{ order.shipping_address }}</td>
+                        <td>{{ order.unit_number }}</td>
+                        <td>
                             <select class="status-dropdown">
-                                <option value="pending" {% if order['order_status'] == 'pending' %}selected{% endif %}>Pending</option>
-                                <option value="completed" {% if order['order_status'] == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="pending" {% if order.order_status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="completed" {% if order.order_status == 'completed' %}selected{% endif %}>Completed</option>
                             </select>
                         </td>
                     </tr>
-                {% endfor %}
             </tbody>
         </table>
     </div>
-    <!-- Add a button or link for additional actions if needed -->
 </div>
 {% endblock %}

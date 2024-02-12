@@ -2,18 +2,57 @@
 {% block title %}Receipt{% endblock %}
 
 {% block content %}
+<style>
+    /* Style for receipt information */
+    #receipt-info {
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 600px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-    <h3>Your order has been confirmed.</h3>
+    #receipt-info h3 {
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    #receipt-info p {
+        margin-bottom: 10px;
+    }
+
+    h3 {
+         text-align: center;
+    }
+
+    .back-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff; /* Set your desired background color */
+        color: #fff; /* Set your desired text color */
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+
+    .back-button:hover {
+        background-color: rgba(0, 123, 255, 0.8); /* Change background color with transparency */
+    }
+</style>
+
+    <a href="/homeUser" class="back-button">Back to Home</a>
     <div id="receipt-info">
         <!-- Payment information will be displayed here -->
     </div>
 
-    <script>
-        // Retrieve payment information from URL parameters
-        var urlParams = new URLSearchParams(window.location.search);
-        var receiptInfo = urlParams.get('info');
+<script>
+    var urlParams = new URLSearchParams(window.location.search);
+    var receiptInfo = urlParams.get('info');
 
-        // Display payment information on the page
-        document.getElementById('receipt-info').innerHTML = receiptInfo;
-    </script>
+    // Display payment information on the page
+    document.getElementById('receipt-info').innerHTML = receiptInfo;
+</script>
 {% endblock %}

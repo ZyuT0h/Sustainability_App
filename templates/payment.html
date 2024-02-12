@@ -3,66 +3,6 @@
 
 {% block content %}
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#address').change(function() {
-        if ($(this).is(':checked')) {
-            // Use default/fake address
-            $('#U_SA').val('543 Main St');
-            $('#U_P').val('122543');
-            $('#U_UN').val('10-23');
-        } else {
-            // Clear the address fields
-            $('#U_SA').val('');
-            $('#U_P').val('');
-            $('#U_UN').val('');
-        }
-    });
-});
-
-$(document).ready(function() {
-    $('#paymentForm').submit(function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Submit the form via AJAX
-        $.ajax({
-            type: 'POST',
-            url: '/payment',
-            data: $('#paymentForm').serialize(),
-            success: function(response) {
-                // Construct payment information string
-                var paymentInfo = "Payment successful!<br><br>" +
-                    "Shipping Address: " + response.shipping_address + "<br>" +
-                    "Postal Code: " + response.postal_code + "<br>" +
-                    "Unit Number: " + response.unit_number + "<br>" +
-                    "<br>Cart Items:<br>" + getCartItemsAsString(response.cart_items) +
-                    "<br>Total Price: $" + response.total_price;
-
-                // Redirect to receipt page with payment information as URL parameter
-                window.location.href = '/receipt?info=' + encodeURIComponent(paymentInfo);
-            },
-            error: function(xhr, status, error) {
-                // Redirect to error page
-                window.location.href = '/error.html';
-            }
-        });
-    });
-});
-
-
-// Helper function to get cart items as string
-function getCartItemsAsString(cartItems) {
-    var cartItemDetails = "";
-    for (var product_id in cartItems) {
-        if (cartItems.hasOwnProperty(product_id)) {
-            var item = cartItems[product_id];
-            cartItemDetails += item.name + " - Quantity: " + item.quantity + " - Price: $" + item.price + "\n";
-        }
-    }
-    return cartItemDetails;
-}
-</script>
 <style>
 
         .row {
@@ -105,16 +45,20 @@ function getCartItemsAsString(cartItems) {
             width: 100%;
         }
 
-        button {
-            background-color:  #28a745;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #28a745; /* Set your desired background color */
+        color: #fff; /* Set your desired text color */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: red;
+        button[type="submit"]:hover {
+            background-color: rgba(40, 167, 69, 0.8); /* Change background color with transparency */
         }
+
 
         h1, h3 {
             text-align: center;
@@ -129,13 +73,13 @@ function getCartItemsAsString(cartItems) {
             width: 48%; /* Adjust width as needed */
         }
 
-        .title {
+      .title {
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 15px;
       opacity: 0.5;
-    }
+      }
 
     .emptyBtn {
       display: flex;
@@ -216,7 +160,32 @@ function getCartItemsAsString(cartItems) {
     .total_price {
       color: red;
     }
+
+    .payment-header {
+    color: green; /* Example color */
+    font-size: 24px; /* Example font size */
+    }
+
+    .address-info {
+    font-weight: bold;
+    /* Add any other styling you need */
+    }
+
+    .back-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff; /* Set your desired background color */
+        color: #fff; /* Set your desired text color */
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .back-button:hover {
+        background-color: rgba(0, 123, 255, 0.8); /* Change background color with transparency */
+    }
 </style>
+
 <br>
     <a href="/cart" class="back-button">Back to Cart</a>
     <div class="row">
@@ -327,66 +296,118 @@ function getCartItemsAsString(cartItems) {
     <!-- Message content will be inserted here -->
     </div>
 
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-document.getElementById("paymentForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent the default form submission
+$(document).ready(function() {
+    $('#paymentForm').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission
 
-    // Client-side validation
-    var errorMessage = "";
+        // Client-side validation
+        var errorMessage = "";
 
-    // Validation for all fields
-    var shippingAddress = document.getElementById("U_SA").value;
-    if (!shippingAddress) {
-        errorMessage += "Shipping Address is required.<br>";
-    }
+        // Validation for all fields
+        var shippingAddress = document.getElementById("U_SA").value;
+        if (!shippingAddress) {
+            errorMessage += "Shipping Address is required.<br>";
+        }
 
-    var postalCode = document.getElementById("U_P").value;
-    if (!postalCode) {
-        errorMessage += "Postal Code is required.<br>";
-    } else if (!/^\d+$/.test(postalCode)) {
-        errorMessage += "Postal Code must contain only numbers.<br>";
-    } else if (postalCode.length !== 6) {
-        errorMessage += "Postal Code must be 6 digits long.<br>";
-    }
+        var postalCode = document.getElementById("U_P").value;
+        if (!postalCode) {
+            errorMessage += "Postal Code is required.<br>";
+        } else if (!/^\d+$/.test(postalCode)) {
+            errorMessage += "Postal Code must contain only numbers.<br>";
+        } else if (postalCode.length !== 6) {
+            errorMessage += "Postal Code must be 6 digits long.<br>";
+        }
 
-    // Validate unit number
-    var unitNumber = document.getElementById("U_UN").value;
-    if (!unitNumber) {
-        errorMessage += "Unit Number is required.<br>";
-    }
+        // Validate unit number
+        var unitNumber = document.getElementById("U_UN").value;
+        if (!unitNumber) {
+            errorMessage += "Unit Number is required.<br>";
+        }
 
-    // Validate card name
-    var cardName = document.getElementById("U_CN").value;
-    if (!cardName) {
-        errorMessage += "Card Name is required.<br>";
-    }
+        // Validate card name
+        var cardName = document.getElementById("U_CN").value;
+        if (!cardName) {
+            errorMessage += "Card Name is required.<br>";
+        }
 
-    var cardNumber = document.getElementById("U_CNO").value;
-    if (!cardNumber) {
-        errorMessage += "Card Number is required.<br>";
-    }
+        var cardNumber = document.getElementById("U_CNO").value;
+        if (!cardNumber) {
+            errorMessage += "Card Number is required.<br>";
+        }
 
-    // Validate expiry date
-    var expiryDate = document.getElementById("U_ED").value;
-    if (!expiryDate) {
-        errorMessage += "Expiry Date is required.<br>";
-    }
+        // Validate expiry date
+        var expiryDate = document.getElementById("U_ED").value;
+        if (!expiryDate) {
+            errorMessage += "Expiry Date is required.<br>";
+        }
 
-    // Validate CVC/CVV
-    var cvc = document.getElementById("U_CVC/CVV").value;
-    if (!cvc) {
-        errorMessage += "CVC/CVV is required.<br>";
-    } else if (cvc.length !== 3) {
-        errorMessage += "CVC/CVV must be 3 digits long.<br>";
-    }
+        // Validate CVC/CVV
+        var cvc = document.getElementById("U_CVC/CVV").value;
+        if (!cvc) {
+            errorMessage += "CVC/CVV is required.<br>";
+        } else if (cvc.length !== 3) {
+            errorMessage += "CVC/CVV must be 3 digits long.<br>";
+        }
 
-    // Display error message if validation fails
-    if (errorMessage) {
-        document.getElementById("error-message").innerHTML = errorMessage;
-        document.getElementById("error-message").style.display = "block";
-        return; // Exit function if there are errors
-    }
-    this.submit();
+        // Display error message if validation fails
+        if (errorMessage) {
+            document.getElementById("error-message").innerHTML = errorMessage;
+            document.getElementById("error-message").style.display = "block";
+            return false; // Prevent form submission if there are errors
+        }
+    $.ajax({
+            type: 'POST',
+            url: '/payment',
+            data: $('#paymentForm').serialize(),
+            success: function(response) {
+                var paymentInfo = "<h3>Payment Successful!</h3><br>" +
+                "<div class='address-info'><strong>Address Information:</strong><br><br>" +
+                "Shipping Address: " + response.shipping_address + "<br>" +
+                "Postal Code: " + response.postal_code + "<br>" +
+                "Unit Number: " + response.unit_number + "<br></div>" +
+                "<br><strong>Ordered Items:</strong><br>" + getCartItemsAsString(response.cart_items) +
+                "<br>Total Price: $" + response.total_price;
+
+                var additionalContent = "Additional Information: Your order will be shipped within 2 business days.";
+                paymentInfo += "<br><br>" + additionalContent;
+
+                // Redirect to receipt page with payment information as URL parameter
+                window.location.href = '/receipt?info=' + encodeURIComponent(paymentInfo);
+            },
+            error: function(xhr, status, error) {
+                // Redirect to error page
+                window.location.href = '/error.html';
+            }
+        });
+    });
+
+    $('#address').change(function() {
+        if ($(this).is(':checked')) {
+            // Use default/fake address
+            $('#U_SA').val('543 Main St');
+            $('#U_P').val('122543');
+            $('#U_UN').val('10-23');
+        } else {
+            // Clear the address fields
+            $('#U_SA').val('');
+            $('#U_P').val('');
+            $('#U_UN').val('');
+        }
+    });
 });
+
+function getCartItemsAsString(cartItems) {
+    var cartItemDetails = "";
+    for (var product_id in cartItems) {
+        if (cartItems.hasOwnProperty(product_id)) {
+            var item = cartItems[product_id];
+            cartItemDetails += "<div>" + item.name + " - Quantity: " + item.quantity + " - Price: $" + item.price + "</div>"; // Wrap each item in <div> tags
+        }
+    }
+    return cartItemDetails;
+}
 </script>
 {% endblock %}
