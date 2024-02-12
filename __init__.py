@@ -395,7 +395,7 @@ def shop():
     db.close()
 
     products_list = []
-    for key in products_dict:
+    for key in sorted(products_dict):
         product = products_dict.get(key)
         products_list.append(product)
 
@@ -682,7 +682,7 @@ def manage_inventory():
     db.close()
 
     products_list = []
-    for key in products_dict:
+    for key in sorted(products_dict):
         product = products_dict.get(key)
         products_list.append(product)
 
@@ -750,6 +750,12 @@ def delete_product(id):
     products_dict = db['Products']
     products_dict.pop(id)
     db['Products'] = products_dict
+    db.close()
+
+    db = shelve.open('product_id_list.db', 'w')
+    product_id_list = db.get('ProductId', [])
+    product_id_list.remove(id)
+    db['ProductId'] = product_id_list
     db.close()
 
     return redirect(url_for('manage_inventory'))
