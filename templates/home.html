@@ -2,5 +2,156 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>home zameera</h1>
+<style>
+    body {
+      background-color: #f8f9fa;
+      color: black;
+    }
+
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 40px;
+    }
+
+    .top-section {
+        background-image: url('hero-image.jpg');
+        background-size: cover;
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        text-align: left;
+        color: black;
+    }
+
+    .top-section h1 {
+        font-size: 50px;
+        margin-bottom: 20px;
+
+    }
+
+    .upcycled {
+        color: green;
+    }
+
+    .explore {
+        font-weight: bold;
+    }
+
+    .top-section p {
+        font-size: 18px;
+
+    }
+
+    .cta-button {
+        background-color: #ff4500;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2em;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+
+    }
+
+    .cta-button:hover {
+        background-color: #ff6a00;
+        color: #fff;
+    }
+
+    .content-section {
+        width: 100%
+        padding: 20px;
+        text-align: left;
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    .content {
+        width: 94%;
+        background-color: #DCDCDC;
+        border-radius: 5px;
+    }
+
+    .mission > p{
+       font-size: 20px;
+    }
+
+     /* Adjust the width of the image to make it smaller */
+    .img-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-height: 300px;
+        margin-bottom: 30px;
+    }
+
+    .img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-height: 300px; /* Maintain the aspect ratio */
+    }
+
+    .img img {
+        max-width: 100%; /* Ensure the image does not exceed the container width */
+        max-height: 100%; /* Ensure the image does not exceed the container height */
+    }
+
+    footer {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="top-section">
+    <div class="container">
+        <h1>Discover Our Unique Collection<br> of <span class="upcycled">Upcycled</span> Treasures</h1>
+        <p>Join us in our eco-friendly journey as we breathe new life<br> into old textiles,
+            crafting vibrant pouches, cozy rugs, and<br> stylish coasters from pre-loved fabrics</p>
+        <p><span class="explore">Explore</span> sustainable elegance with each unique piece!</p>
+        <a href="{{ url_for('shop') }}" class="cta-button">Shop Now</a>
+    </div>
+</div>
+<div class="content-section">
+    <div class="container content">
+        <div class="mission">
+            <h3>About Us</h3>
+            <p>Our mission is to reduce textile waste by upcycling old clothes and fabrics into unique products like pouches, rugs, and coasters.</p>
+            <div class="img-container">
+                <div class="row">
+                    <div class="col-sm-4 img">
+                        <img src="static/home_images/make-your-own-bag-from-old-clothes.jpg">
+                    </div>
+                    <div class="col-sm-4 img">
+                        <img src="static/home_images/IMG_3636-scaled.jpeg">
+                    </div>
+                    <div class="col-sm-4 img">
+                        <img src="static/home_images/PIXNIO-2389372-3000x2000-1-scaled.jpg">
+                    </div>
+                </div>
+            </div>
+            <div class="img-container">
+                <div class="row">
+                    <div class="col-sm-6 img">
+                        <img src="static/home_images/1713815.jpg">
+                    </div>
+                    <div class="col-sm-6 img">
+                        <img src="static/home_images/eco-friendly-bags.jpg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<footer>
+    <p>&copy; 2024 Fabric Revive. All rights reserved.</p>
+</footer>
 {% endblock %}
