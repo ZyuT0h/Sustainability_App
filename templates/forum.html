@@ -1,5 +1,5 @@
 {% extends "/base/base_user.html" %}
-{% block title %}Library Loan System - Home{% endblock %}
+{% block title %}Forum{% endblock %}
 
 {% block content %}
 
@@ -68,6 +68,50 @@
         padding: 5px;
         box-sizing: border-box;
     }
+
+        .comment-card {
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .comment-card h6 {
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    .comment-card p {
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .comment-card .reply-form input[type="text"] {
+        width: calc(97% - 50px);
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .comment-card .reply-form button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .comment-card .reply-form button:hover {
+        background-color: #0056b3;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
 </style>
 
 <script>
@@ -164,6 +208,29 @@
         console.error('Error:', error);
     });
 }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var replies = document.querySelectorAll('.reply');
+        replies.forEach(function(reply) {
+            // Check if the reply is from the admin
+            if (reply.dataset.user === 'Admin') {
+                // Keep the red color for admin replies
+                reply.style.color = 'red';
+            } else {
+                // Assign random colors to other replies
+                reply.style.color = getRandomColor();
+            }
+        });
+    });
 </script>
 
 <br>
@@ -194,23 +261,26 @@
         </form>
         </div>
     </div>
-
-    <h1>FORUM</h1><hr>
-    {% set comment_index = 0 %}
+<br><hr>
+<h1>FORUM</h1>
+{% set comment_index = 0 %}
 {% for comment in comments %}
-    {{ comment.username }}:<br>
-    {{ comment.subject }}<br>
-    {{ comment.message }}<br>
-    {% if comment.replies %}
-        {% for reply in comment.replies %}
-            &nbsp;&nbsp;Reply: {{ reply }}<br>
-        {% endfor %}
-    {% endif %}
-    <form onsubmit="event.preventDefault(); submitReply({{ comment_index }});">
-        <input type="text" id="reply{{ comment_index }}" placeholder="Reply...">
-        <button type="submit">Reply</button>
-    </form>
-    <hr>
+    <div class="comment-card">
+        <h6>{{ comment.username }}</h6>
+        <p>{{ comment.subject }}</p>
+        <p>{{ comment.message }}</p>
+        {% if comment.replies %}
+            {% for reply in comment.replies %}
+                <p class="reply" id="reply{{ comment_index }}_{{ loop.index }}">{{ reply }}</p>
+            {% endfor %}
+        {% endif %}
+        <form class="reply-form" onsubmit="event.preventDefault(); submitReply({{ comment_index }});">
+            <input type="text" id="reply{{ comment_index }}" placeholder="Reply...">
+            <button type="submit">Reply</button>
+        </form>
+    </div>
     {% set comment_index = comment_index + 1 %}
 {% endfor %}
+
+
 {% endblock %}
