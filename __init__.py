@@ -11,6 +11,7 @@ import random
 import re
 import shelve
 import bcrypt
+import uuid
 
 
 app = Flask(__name__)
@@ -342,9 +343,11 @@ def register_staff():
 def order_details():
     # Retrieve order details from session
     order_details = session.get('order_details')
+    order_id = session.get('order_id')
     print("Order details in session:", order_details)
 
-    return render_template('order_details.html', order=[order_details])
+    return render_template('order_details.html', order=order_details, order_id=order_id)
+
 @app.route('/staff_details')
 def staff_details():
     # Retrieve staff email from session
@@ -941,9 +944,15 @@ def payment():
     customer_id = session.get('customer_id')
     app.logger.info("Customer ID retrieved from session: %s", customer_id)
 
+    # Set customer email in session
+    customer_email = session.get('customer_email')
+    app.logger.info("Customer email retrieved from session: %s", customer_email)
+
     # Log session data after setting customer_id
     session['customer_id'] = customer_id
+    session['customer_email'] = customer_email
     app.logger.info("Session data after setting customer_id: %s", session)
+
     cart_items = session.get('cart', {})
     total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
 
@@ -994,7 +1003,30 @@ def payment():
 @app.route('/receipt', methods=['GET'])
 def receipt():
     # Get payment information from the URL parameter
-    payment_info = request.args.get('info', '')
+    total_price = request.args.get('total_price', '')
+
+    # Retrieve customer data from the database
+    with shelve.open('customer.db') as db:
+        customer_data = db.get('customer', {})
+
+    # Construct payment information string
+    payment_info = "Payment successful!<br><br>" + \
+                    "Shipping Address: " + customer_data.get('shipping_address', '') + "<br>" + \
+                    "Postal Code: " + customer_data.get('postal_code', '') + "<br>" + \
+                    "Unit Number: " + customer_data.get('unit_number', '') + "<br>" + \
+                    "<br>Total Price: $" + total_price
+
+    # Store order details in the order_details session variable
+    session['order_details'] = {
+        'shipping_address': customer_data.get('shipping_address', ''),
+        'postal_code': customer_data.get('postal_code', ''),
+        'unit_number': customer_data.get('unit_number', ''),
+        'total_price': total_price,
+    }
+
+    order_id = str(uuid.uuid4())[:8]
+
+    session['order_id'] = order_id
 
     # Render the receipt template with the payment information
     return render_template('receipt.html', payment_info=payment_info)
