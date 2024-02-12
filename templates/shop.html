@@ -146,7 +146,7 @@
                         </div>
                     </div>
                     <div class="mt-auto mb-2">
-                        <a href="/payment/{{product.get_product_id()}}" class="btn btn-danger">Buy Now</a>
+                        <a href="{{ url_for('payment', id=product.get_product_id()) }}" class="btn btn-danger">Buy Now</a>
                     </div>
                 </div>
             </div>
