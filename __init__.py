@@ -532,6 +532,93 @@ def empty_cart():
     return redirect(url_for('cart'))
 
 
+@app.route('/addCategory', methods=['GET', 'POST'])
+def add_category():
+    if request.method == 'POST':
+        category = request.form['categoryName']
+
+        categories_dict = {}
+        db = shelve.open('categories.db', 'c')
+        try:
+            categories_dict = db['Categories']
+        except:
+            print('Error in retrieving Categories from categories.db.')
+
+        # Ensure category name is unique
+        if category not in categories_dict:
+            categories_dict[category] = category
+            db['Categories'] = categories_dict
+            db.close()
+            return redirect(url_for('manage_category'))
+    return render_template('addCategory.html')
+
+@app.route('/getCategories')
+def get_categories():
+    categories_dict = {}
+    db = shelve.open('categories.db', 'r')
+    categories_dict = db['Categories']
+    db.close()
+
+    categories_list = []
+    for key in categories_dict:
+        category = categories_dict.get(key)
+        categories_list.append(category)
+
+    return categories_list
+
+
+@app.route('/manageCategory')
+def manage_category():
+    categories = get_categories()
+    return render_template('manageCategory.html', count=len(get_categories()), categories_list=categories)
+
+
+@app.route('/updateCategory/<string:category>/', methods=['GET', 'POST'])
+def update_category(category):
+    if request.method == 'POST':
+        categories_dict = {}
+        db = shelve.open('categories.db', 'w')
+        categories_dict = db['Categories']
+        category = categories_dict.get(category)
+
+        print(categories_dict)
+        print(category)
+
+        # Use request.form to get form data
+        new_category = request.form['categoryName']
+        print(new_category)
+
+        categories_dict[category] = new_category
+        db['Categories'] = categories_dict
+        print(categories_dict)
+        db.close()
+
+        return redirect(url_for('manage_category'))
+    else:
+        categories_dict = {}
+        db = shelve.open('categories.db', 'r')
+        categories_dict = db['Categories']
+        db.close()
+        category_data = categories_dict.get(category)
+
+        # Use request.form to populate form data
+        category_data = category
+
+        return render_template('updateCategory.html', category_data=category_data)
+
+
+@app.route('/deleteCategory/<string:category>', methods=['POST'])
+def delete_category(category):
+    categories_dict = {}
+    db = shelve.open('categories.db', 'w')
+    categories_dict = db['Categories']
+    categories_dict.pop(category)
+    db['Categories'] = categories_dict
+    db.close()
+
+    return redirect(url_for('manage_category'))
+
+
 @app.route('/addProduct', methods=['GET', 'POST'])
 def add_product():
     if request.method == 'POST':
@@ -563,7 +650,10 @@ def add_product():
         db.close()
 
         return redirect(url_for('manage_inventory'))
-    return render_template('addProduct.html')
+
+    # Get the list of categories to pass to the template
+    categories = get_categories()  # Custom function to get existing categories
+    return render_template('addProduct.html', categories=categories)
 
 
 @app.route('/manageInventory')
@@ -628,9 +718,11 @@ def update_product(id):
         price_data = product.get_price()
         description_data = product.get_description()
 
+        categories = get_categories()
+
         return render_template('updateProduct.html', product_name_data=product_name_data,
                                category_data=category_data, stock_data=stock_data, price_data=price_data,
-                               description_data=description_data)
+                               description_data=description_data, categories=categories)
 
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])

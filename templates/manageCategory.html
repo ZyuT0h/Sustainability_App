@@ -2,7 +2,24 @@
 {% block title %}Inventory Management{% endblock %}
 
 {% block content %}
-<h1 class="display-4">Inventory Management</h1>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    h3 {
+        margin: 20px auto;
+        margin-bottom: 15px;
+    }
+
+    .btn-danger {
+        float: right;
+        margin-right: 40%;
+    }
+</style>
+
+<h3>Category Management</h3>
 <div>
  {% if count == 0 %}
  <p>There are no category.</p>
