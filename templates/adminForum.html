@@ -11,6 +11,24 @@
     /* Add styling for the container of replies */
     margin-top: 10px;
     }
+
+    .comment-container {
+    position: relative;
+    }
+
+    .delete-comment {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    }
+
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -104,21 +122,24 @@
     {% if admin %}
         <hr>
         {% for comment in comments %}
-            {{ comment.username }}:<br>
-            {{ comment.subject }}<br>
-            {{ comment.message }}<br>
-            {% if comment.replies %}
-                {% for reply in comment.replies %}
-                    &nbsp;&nbsp;Reply: {{ reply }}<br>
-                {% endfor %}
-            {% endif %}
-            <form onsubmit="event.preventDefault(); submitReply({{ loop.index - 1 }});">
-                <input type="text" id="reply{{ loop.index - 1 }}" placeholder="Reply...">
-                <button type="submit">Reply</button>
-            </form>
-            <button class="delete-comment" data-index="{{ loop.index - 1 }}">Delete</button>
+            <div class="comment-container">
+                <button class="delete-comment" data-index="{{ loop.index - 1 }}">Delete</button>
+                {{ comment.username }}:<br>
+                {{ comment.subject }}<br>
+                {{ comment.message }}<br>
+                {% if comment.replies %}
+                    {% for reply in comment.replies %}
+                        &nbsp;&nbsp;Reply: {{ reply }}<br>
+                    {% endfor %}
+                {% endif %}
+                <form onsubmit="event.preventDefault(); submitReply({{ loop.index - 1 }});">
+                    <input type="text" id="reply{{ loop.index - 1 }}" placeholder="Reply...">
+                    <button type="submit">Reply</button>
+                </form>
+            </div>
             <hr>
         {% endfor %}
     {% endif %}
 </fieldset>
+
 {% endblock %}
