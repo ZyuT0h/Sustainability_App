@@ -136,7 +136,6 @@
                 </div>
                 <div class="col-sm-2 d-flex flex-column">
                     <div class="mt-auto mb-2">
-                        <button type="submit" class="btn btn-danger add-to-cart" data-product-id="{{ product.get_product_id() }}">Add to Cart</button>
                     </div>
                 </div>
                 <div class="col-sm-2 d-flex flex-column">
@@ -146,7 +145,7 @@
                         </div>
                     </div>
                     <div class="mt-auto mb-2">
-                        <a href="{{ url_for('payment', id=product.get_product_id()) }}" class="btn btn-danger">Buy Now</a>
+                        <button type="submit" class="btn btn-danger add-to-cart" data-product-id="{{ product.get_product_id() }}">Add to Cart</button>
                     </div>
                 </div>
             </div>
