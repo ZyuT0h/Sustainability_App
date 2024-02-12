@@ -2,7 +2,24 @@
 {% block title %}Inventory Management{% endblock %}
 
 {% block content %}
-<h1 class="display-4">Inventory Management</h1>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    h3 {
+        margin: 20px auto;
+        margin-bottom: 15px;
+    }
+
+    .delete-btn1 {
+        float: right;
+        margin-right: 40%;
+    }
+</style>
+
+<h3>Category Management</h3>
 <div>
  {% if count == 0 %}
  <p>There are no category.</p>
@@ -41,7 +58,7 @@
                 <td>
                     <form action="{{url_for('delete_category', category=category)}}" method="POST">
                         <!-- Button to Open the Modal -->
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{ category|replace(' ', '_') | safe }}">
+                        <button type="button" class="btn btn-danger delete-btn1" data-bs-toggle="modal" data-bs-target="#myModal_{{ category|replace(' ', '_') | safe }}">
                             Delete
                         </button>
                         <!-- The Modal -->

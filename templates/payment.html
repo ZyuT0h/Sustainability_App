@@ -128,6 +128,94 @@ function getCartItemsAsString(cartItems) {
         .grouping input[type="text"] {
             width: 48%; /* Adjust width as needed */
         }
+
+        .title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+      opacity: 0.5;
+    }
+
+    .emptyBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 25px;
+    }
+
+    .emptyCart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 20px;
+      font-size: 14px;
+      color: white;
+      background-color: #D4403A;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .emptyCart:hover {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 20px;
+      font-size: 14.5px;
+      color: white;
+      background-color: #A72925;
+      border: none;
+
+    }
+
+    hr {
+      padding: 0 auto;
+      margin: 10px auto;
+      border: 1px solid;
+    }
+
+    .cart {
+        width: 70%;
+        margin: 0 auto;
+        background-color: #ffffff; /* Set a white background for the form */
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        border-radius: 8px; /* Add rounded corners */
+    }
+
+    .cartIsEmpty {
+      text-align: center;
+      opacity: 0.7;
+      margin-top: 25px;
+    }
+
+    .cart-list {
+      min-height: 300px;
+    }
+
+    img {
+      border-radius: 5px;
+    }
+
+    .content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+
+    .value {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      padding: 5px;
+
+    }
+
+    .total_price {
+      color: red;
+    }
 </style>
 <br>
     <a href="/cart" class="back-button">Back to Cart</a>
@@ -179,14 +267,60 @@ function getCartItemsAsString(cartItems) {
             </div>
         </div>
         <div class="column">
-            <h2>Order summary</h2>
-            <hr>
-            <ul>
-              {% for product_id, item in cart_items.items() %}
-                <li>{{ item.name }} - Quantity: {{ item.quantity }} - Price: ${{ '%.2f'|format(item.price | float) }}</li>
-              {% endfor %}
-            </ul>
-            <p>Total Price: ${{ '%.2f'|format(total_price) }}</p>
+            <h3>Order Summary</h3>
+              <div class="row header">
+                <div class="col-sm-3 title">Product details</div>
+                <div class="col-sm-2 title"></div>
+                <div class="col-sm-2 title">Price</div>
+                <div class="col-sm-2 title">Quantity</div>
+                <div class="col-sm-3 title">Subtotal</div>
+              </div>
+              <hr>
+              <div class="cart-list">
+                {% if cart_items %}
+                {% for product_id, item in cart_items.items() %}
+                <div class="cart-item">
+                  <div class="row mb-3 mt-3">
+                    <div class="col-sm-3 content">
+                      <div class="img-fluid-container">
+                        {% if item.image %}
+                        <img src="{{ url_for('static', filename='product_images/' + item.image) }}" style="max-width: 100px; max-height: 100px;">
+                        {% else %}
+                        No Image
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="col-sm-2 content">
+                      {{ item.name }}
+                    </div>
+                    <div class="col-sm-2 content">
+                      ${{ '%.2f'|format(item.price | float) }}
+                    </div>
+                    <div class="col-sm-2 content">
+                        {{ item.quantity }}
+                    </div>
+                    <div class="col-sm-3 content">
+                      ${{ '%.2f'|format(item.subtotal | float) }}
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="cartIsEmpty">
+                  Cart is empty
+                </div>
+                {% endif %}
+              </div>
+              <div class="bottom">
+                <hr>
+                <div class="row header">
+                  <div class="col-sm-3"></div>
+                  <div class="col-sm-2"></div>
+                    <div class="col-sm-2"></div>
+                  <div class="col-sm-2 value">Total Price</div>
+                  <div class="col-sm-3 value total_price">${{ '%.2f'|format(total_price) }}</div>
+                </div>
+              </div>
         </div>
     </div>
     <div id="popupMessage" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid black; border-radius: 5px; z-index: 999;">

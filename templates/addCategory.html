@@ -2,10 +2,54 @@
 {% block title %}Admin - Add Category{% endblock %}
 
 {% block content %}
-<h1 class="display-4">Add Category</h1>
-<form action="" method="POST">
-    <label for="categoryName">Category Name:</label><br>
-    <input type="text" id="categoryName" name="categoryName" required><br>
-    <input type="submit" value="Add Category" class="btn btn-primary">
+
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    h3 {
+        text-align: center;
+        margin: 20px auto;
+        margin-bottom: 15px;
+    }
+
+    form {
+        width: 70%;
+        margin: 0 auto;
+        background-color: #ffffff; /* Set a white background for the form */
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        border-radius: 8px; /* Add rounded corners */
+    }
+
+    label {
+        font-size: 22px;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ced4da; /* Add a border with a light gray color */
+      border-radius: 4px; /* Add rounded corners */
+      margin-top: 3px;
+    }
+</style>
+
+<h3>Add Category</h3>
+<form action="" method="POST" enctype="multipart/form-data">
+    <div class="form-control">
+        <div class="form-group">
+            <label for="categoryName">Category Name:</label>
+            <input type="text" id="categoryName" name="categoryName" class="form-control mb-4" required>
+        </div>
+        <input type="submit" value="Submit" class="btn btn-primary"/>
+    </div>
 </form>
 {% endblock %}

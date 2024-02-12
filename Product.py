@@ -1,5 +1,6 @@
 import shelve
 
+
 class Product:
 
     def __init__(self, product_name, category, stock, price, description):

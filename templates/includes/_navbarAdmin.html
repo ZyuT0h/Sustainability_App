@@ -1,3 +1,11 @@
+<style>
+  .navbar-brand {
+    color: #87CEFA !important;
+    font-family: 'YourNewFont', sans-serif;
+  }
+
+</style>
+
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="/homeAdmin">Fabric Revive</a>
@@ -22,8 +30,10 @@
           </ul>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Manage Inventory</a>
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Shop Management</a>
           <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/addCategory">Add Category</a></li>
+            <li><a class="dropdown-item" href="/manageCategory">Manage Category</a></li>
             <li><a class="dropdown-item" href="/addProduct">Add Products</a></li>
             <li><a class="dropdown-item" href="/manageInventory">Manage Inventory</a></li>
           </ul>
@@ -47,11 +57,3 @@
     </div>
   </div>
 </nav>
-
-<style>
-  .navbar-brand {
-    color: #87CEFA !important;
-    font-family: 'YourNewFont', sans-serif;
-  }
-
-</style>

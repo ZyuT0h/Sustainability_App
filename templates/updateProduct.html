@@ -11,6 +11,8 @@
     }
     h3 {
         text-align: center;
+        margin: 20px auto;
+        margin-bottom: 15px;
     }
     .display-4 {
         display: flex;
@@ -73,9 +75,13 @@
         <div class="form-group">
             <label for="category">Category:</label>
             <select id="category" name="category" class="form-control">
-                <option value="Coaster" {% if category_data == 'Coaster' %}selected{% endif %}>Coaster</option>
-                <option value="Pouch" {% if category_data == 'Pouch' %}selected{% endif %}>Pouch</option>
-                <option value="Tote bag" {% if category_data == 'Tote bag' %}selected{% endif %}>Tote bag</option>
+                {% for category in categories_list %}
+                {% if category == category_data %}
+                <option value="{{ category }}" selected>{{ category }}</option>
+                {% else %}
+                <option value="{{ category }}">{{ category }}</option>
+                {% endif %}
+                {% endfor %}
             </select><br>
         </div>
         <div class="form-group">
