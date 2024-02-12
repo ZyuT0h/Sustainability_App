@@ -591,40 +591,6 @@ def manage_category():
     return render_template('manageCategory.html', count=len(get_categories()), categories_list=categories_list)
 
 
-@app.route('/updateCategory/<string:category>/', methods=['GET', 'POST'])
-def update_category(category):
-    if request.method == 'POST':
-        categories_dict = {}
-        db = shelve.open('categories.db', 'w')
-        categories_dict = db['Categories']
-        category = categories_dict.get(category)
-
-        print(categories_dict)
-        print(category)
-
-        # Use request.form to get form data
-        new_category = request.form['categoryName']
-        print(new_category)
-
-        categories_dict[category] = new_category
-        db['Categories'] = categories_dict
-        print(categories_dict)
-        db.close()
-
-        return redirect(url_for('manage_category'))
-    else:
-        categories_dict = {}
-        db = shelve.open('categories.db', 'r')
-        categories_dict = db['Categories']
-        db.close()
-        category_data = categories_dict.get(category)
-
-        # Use request.form to populate form data
-        category_data = category
-
-        return render_template('updateCategory.html', category_data=category_data)
-
-
 @app.route('/deleteCategory/<string:category>', methods=['POST'])
 def delete_category(category):
     categories_dict = {}
