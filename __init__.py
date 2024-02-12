@@ -738,7 +738,7 @@ def forum():
 @app.route('/submit_comment', methods=['POST'])
 def submit_comment():
     data = request.get_json()
-    username = "Sarah"  # Replace with the actual username after it can be retrieved
+    username = "Minju"  # Replace with the actual username after it can be retrieved
 
     # Save the comment to the shelve file
     save_comment(username, data['subject'], data['message'])
@@ -790,7 +790,6 @@ def add_reply(parent_comment_index, reply_message):
 def admin_forum():
     # retrieve comments for the admin side forum
     comments = get_comments()
-
     return render_template('adminForum.html', comments=comments, admin=True)
 
 

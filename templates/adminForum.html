@@ -4,11 +4,9 @@
 {% block content %}
 <style>
     .reply {
-    /* Add styling for each reply */
     margin-bottom: 10px;
     }
     .replies-container {
-    /* Add styling for the container of replies */
     margin-top: 10px;
     }
 
@@ -74,8 +72,8 @@
 
 </style>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const deleteButtons = document.querySelectorAll('.delete-button'); // Changed class name here
+document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-button');
 
         deleteButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -83,35 +81,30 @@
                 deleteComment(commentIndex);
             });
         });
-
-        function deleteComment(commentIndex) {
-            // Use AJAX to send a request to the server to delete the comment
-            fetch('/delete_comment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ comment_index: commentIndex }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Update the comments section with the updated comments
-                    const deletedComment = document.querySelector(`[data-index="${commentIndex}"]`);
-
-                    // Update the content to indicate deletion
-                    if (deletedComment) {
-                        deletedComment.innerHTML = '<em>This comment has been deleted.</em>';
-                    }
-                } else {
-                    console.error('Failed to delete comment');
-                }
-            })
-            .catch(error => {
-                console.error('Error during comment deletion:', error);
-            });
-        }
     });
+
+    function deleteComment(commentIndex) {
+        fetch('/delete_comment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ comment_index: commentIndex }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update UI or notify user
+                alert('Comment deleted successfully!');
+                // Optionally, update the UI to reflect the deleted comment
+            } else {
+                console.error('Failed to delete comment');
+            }
+        })
+        .catch(error => {
+            console.error('Error during comment deletion:', error);
+        });
+    }
 
     function submitReply(parentCommentIndex) {
     var replyMessage = document.getElementById("reply" + parentCommentIndex).value;
@@ -185,7 +178,7 @@
     {% set comment_index = 0 %}
     {% for comment in comments %}
         <div class="comment-card">
-            <button class="delete-button" data-index="{{ comment_index }}"> x </button> <!-- Added data-index attribute -->
+            <button class="delete-button" data-index="{{ comment_index }}">Delete</button>
             <h6>{{ comment.username }}</h6>
             <p>{{ comment.subject }}</p>
             <p>{{ comment.message }}</p>
@@ -202,5 +195,4 @@
         {% set comment_index = comment_index + 1 %}
     {% endfor %}
 </fieldset>
-
 {% endblock %}
