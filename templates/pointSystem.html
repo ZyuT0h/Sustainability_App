@@ -2,34 +2,81 @@
 {% block title %}Point System{% endblock %}
 
 {% block content %}
-<h1>Point System</h1>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Customer ID</th>
-            <th>Points Collected </th>
-            <th>Points Redeemed </th>
-            <th>Points Left</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for points in points_list %}
-            <tr>
-                <td>{{ points.get_customer_id() }}</td>
-                <td>{{ points.get_pts_collected() }}</td>
-                <td>{{ points.get_pts_redeemed() }}</td>
-                <td>{{ points.get_pts_left() }}</td>
-                <td><a href="/edit_points/{{ points.get_customer_id() }}" class="btn btn-warning">Update</a></td>
-                <td>
-                    <form action="{{ url_for('delete_points', cust_id=points.get_customer_id()) }}" method="POST">
-                    <input type="submit" value="Delete" class="btn btn-danger"
-                           onclick="return confirm('Are you sure you want to delete Customer ID {{points.get_customer_id()}}?')">
-                    </form>
-                </td>
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 20px;
+    }
 
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) td {
+        background-color: #f8f9fa;
+    }
+
+    .table-striped tbody tr:nth-of-type(even) td {
+        background-color: #ffffff;
+    }
+</style>
+
+<div class="container">
+    <h1 class="display-4">Point System</h1>
+    <div class="table-container">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Points Collected </th>
+                        <th>Points Redeemed </th>
+                        <th>Points Left</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for points in points_list %}
+                        <tr>
+                            <td>{{ points.get_customer_id() }}</td>
+                            <td>{{ points.get_pts_collected() }}</td>
+                            <td>{{ points.get_pts_redeemed() }}</td>
+                            <td>{{ points.get_pts_left() }}</td>
+                            <td><a href="/edit_points/{{ points.get_customer_id() }}" class="btn btn-warning">Update</a></td>
+                            <td>
+                                <form action="{{ url_for('delete_points', cust_id=points.get_customer_id()) }}" method="POST">
+                                <input type="submit" value="Delete" class="btn btn-danger"
+                                       onclick="return confirm('Are you sure you want to delete Customer ID {{points.get_customer_id()}}?')">
+                                </form>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}
