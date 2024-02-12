@@ -32,11 +32,6 @@ def home_user():
     return render_template('homeUser.html')
 
 
-@app.route('/homeAdmin')
-def home_admin():
-    return render_template('homeAdmin.html')
-
-
 # Open the shelve file in writeback mode for registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -131,7 +126,7 @@ def admin_login():
                     return redirect('/change_password')
                 else:
                     # Successful login, redirect to staff profile or other page
-                    return redirect('/homeAdmin')  # You might need to adjust this based on your routes
+                    return redirect('/staff_profile')  # You might need to adjust this based on your routes
             else:
                 # Incorrect password
                 flash('Incorrect password. Please try again.', 'error')
@@ -424,7 +419,8 @@ def cart():
     cart_items = session.get('cart', {})
     total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
     total_quantity = sum(item['quantity'] for item in cart_items.values())
-    return render_template('cart.html', cart_items=cart_items, total_price=total_price, total_quantity=total_quantity)
+    return render_template('cart.html', cart_items=cart_items, total_price=total_price,
+                           total_quantity=total_quantity)
 
 
 @app.route('/add_to_cart/<int:id>', methods=['POST'])
