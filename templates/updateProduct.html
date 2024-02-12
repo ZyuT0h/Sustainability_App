@@ -75,7 +75,7 @@
         <div class="form-group">
             <label for="category">Category:</label>
             <select id="category" name="category" class="form-control">
-                {% for category in categories %}
+                {% for category in categories_list %}
                 {% if category == category_data %}
                 <option value="{{ category }}" selected>{{ category }}</option>
                 {% else %}

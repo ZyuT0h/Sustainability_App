@@ -50,7 +50,11 @@
                 No Image
                 {% endif %}
             </td>
+            {% if product.get_category() in categories_list %}
             <td>{{ product.get_category() }}</td>
+            {% else %}
+            <td>None</td>
+            {% endif %}
             <td>{{ product.get_stock() }}</td>
             <td>{{ product.get_price() }}</td>
             <td>{{ product.get_description() }}</td>

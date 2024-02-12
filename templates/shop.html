@@ -101,7 +101,7 @@
         <h5>Categories</h5>
         <div class="category-content">
             <a href="{{ url_for('shop') }}">All product</a><br>
-            {% for category in categories %}
+            {% for category in categories_list %}
             <a href="{{ url_for('category_page', category=category) }}">{{ category }}</a><br>
             {% endfor %}
         </div>

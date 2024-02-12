@@ -399,8 +399,8 @@ def shop():
         product = products_dict.get(key)
         products_list.append(product)
 
-    categories = get_categories()
-    return render_template('shop.html', products_list=products_list, categories=categories)
+    categories_list = get_categories()
+    return render_template('shop.html', products_list=products_list, categories_list=categories_list)
 
 
 @app.route('/shop/<category>')
@@ -412,8 +412,8 @@ def category_page(category):
         db.close()
 
         products_list = [product for product in products_dict.values() if product.get_category() == category]
-        categories = get_categories()
-        return render_template('shop.html', products_list=products_list, categories=categories)
+        categories_list = get_categories()
+        return render_template('shop.html', products_list=products_list, categories_list=categories_list)
 
 
 @app.route('/cart')
@@ -587,8 +587,8 @@ def get_categories():
 
 @app.route('/manageCategory')
 def manage_category():
-    categories = get_categories()
-    return render_template('manageCategory.html', count=len(get_categories()), categories_list=categories)
+    categories_list = get_categories()
+    return render_template('manageCategory.html', count=len(get_categories()), categories_list=categories_list)
 
 
 @app.route('/updateCategory/<string:category>/', methods=['GET', 'POST'])
@@ -670,8 +670,8 @@ def add_product():
         return redirect(url_for('manage_inventory'))
 
     # Get the list of categories to pass to the template
-    categories = get_categories()  # Custom function to get existing categories
-    return render_template('addProduct.html', categories=categories)
+    categories_list = get_categories()  # Custom function to get existing categories
+    return render_template('addProduct.html', categories_list=categories_list)
 
 
 @app.route('/manageInventory')
@@ -686,7 +686,10 @@ def manage_inventory():
         product = products_dict.get(key)
         products_list.append(product)
 
-    return render_template('manageInventory.html', count=len(products_list), products_list=products_list)
+    categories_list = get_categories()
+
+    return render_template('manageInventory.html', count=len(products_list),
+                           products_list=products_list, categories_list=categories_list)
 
 
 @app.route('/updateProduct/<int:id>/', methods=['GET', 'POST'])
@@ -736,11 +739,11 @@ def update_product(id):
         price_data = product.get_price()
         description_data = product.get_description()
 
-        categories = get_categories()
+        categories_list = get_categories()
 
         return render_template('updateProduct.html', product_name_data=product_name_data,
                                category_data=category_data, stock_data=stock_data, price_data=price_data,
-                               description_data=description_data, categories=categories)
+                               description_data=description_data, categories_list=categories_list)
 
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])

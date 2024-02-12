@@ -13,7 +13,7 @@
         margin-bottom: 15px;
     }
 
-    .btn-danger {
+    .delete-btn1 {
         float: right;
         margin-right: 40%;
     }
@@ -58,7 +58,7 @@
                 <td>
                     <form action="{{url_for('delete_category', category=category)}}" method="POST">
                         <!-- Button to Open the Modal -->
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{ category|replace(' ', '_') | safe }}">
+                        <button type="button" class="btn btn-danger delete-btn1" data-bs-toggle="modal" data-bs-target="#myModal_{{ category|replace(' ', '_') | safe }}">
                             Delete
                         </button>
                         <!-- The Modal -->

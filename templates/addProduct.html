@@ -68,7 +68,7 @@
             <label for="category">Category:</label>
             <select id="category" name="category" class="form-control">
                 <option value="" disabled selected>Select a category</option>
-                {% for category in categories %}
+                {% for category in categories_list %}
                 <option value="{{ category }}">{{ category }}</option>
                 {% endfor %}
             </select><br>
