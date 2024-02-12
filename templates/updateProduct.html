@@ -76,7 +76,11 @@
             <label for="category">Category:</label>
             <select id="category" name="category" class="form-control">
                 {% for category in categories %}
+                {% if category == category_data %}
+                <option value="{{ category }}" selected>{{ category }}</option>
+                {% else %}
                 <option value="{{ category }}">{{ category }}</option>
+                {% endif %}
                 {% endfor %}
             </select><br>
         </div>
