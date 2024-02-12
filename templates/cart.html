@@ -8,6 +8,51 @@
       background-color: #f8f9fa;
     }
 
+    .title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+      opacity: 0.5;
+    }
+
+    .emptyBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 25px;
+    }
+
+    .emptyCart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 20px;
+      font-size: 14px;
+      color: white;
+      background-color: #D4403A;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .emptyCart:hover {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 20px;
+      font-size: 14.5px;
+      color: white;
+      background-color: #A72925;
+      border: none;
+
+    }
+
+    hr {
+      padding: 0 auto;
+      margin: 10px auto;
+      border: 1px solid;
+    }
+
     .cart {
         width: 70%;
         margin: 0 auto;
@@ -17,23 +62,38 @@
         border-radius: 8px; /* Add rounded corners */
     }
 
+    .cartIsEmpty {
+      text-align: center;
+      opacity: 0.7;
+      margin-top: 25px;
+    }
+
+    .cart-list {
+      min-height: 300px;
+    }
+
     img {
       border-radius: 5px;
+    }
+
+    .content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .quantity-control {
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 1px green solid;
     }
 
     .quantity-minus {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 2px;
-      height: 20px;
+      padding: 5px;
+      height: 18px;
       font-size: 20px;
       border-radius: 100px;
     }
@@ -41,47 +101,103 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 2px;
-      height: 20px;
+      padding: 4px;
+      height: 18px;
       font-size: 15px;
       border-radius: 100px;
     }
 
-    .cart-item, .row mb-3 mt-3, .col-sm-3, .img-fluid-container, .col-sm-2, p {
-      border: 1px solid red;
+    .clearItem {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-sizing: box;
+      font-size: 13px;
+      padding: 5px;
+      height: 20px;
+      opacity: 0.6;
+      border: 1px solid;
+      border-radius: 100px;
     }
 
+    .clearItem:hover {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-sizing: box;
+      font-size: 13px;
+      padding: 5px;
+      height: 20px;
+      opacity: 0.6;
+      color: red;
+      border: 2px solid red;
+      border-radius: 100px;
 
+    }
+
+    .value {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      padding: 5px;
+
+    }
+
+    .count {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      font-size: 18px;
+      padding: 5px;
+      margin: auto 10px;
+    }
+
+    .total_price {
+      color: red;
+    }
+
+    .paymentBtn {
+      float: right;
+    }
 </style>
+
 <div class="cart mt-4">
-  <h1>My cart</h1>
+  <h3>My cart</h3>
+  <div class="row header">
+    <div class="col-sm-2 title">Product details</div>
+    <div class="col-sm-2 title"></div>
+    <div class="col-sm-2 title">Price</div>
+    <div class="col-sm-2 title">Quantity</div>
+    <div class="col-sm-2 title">Subtotal</div>
+    <div class="col-sm-2 emptyBtn">
+      <form action="/empty_cart" method="POST">
+        <button type="submit" class="emptyCart">Empty cart</button>
+      </form>
+    </div>
+  </div>
   <hr>
-  <form action="/clear_cart" method="POST">
-    <button type="submit" class="btn btn-danger">Clear cart</button>
-  </form>
   <div class="cart-list">
+    {% if cart_items %}
     {% for product_id, item in cart_items.items() %}
     <div class="cart-item">
       <div class="row mb-3 mt-3">
-        <div class="col-sm-3">
+        <div class="col-sm-2 content">
           <div class="img-fluid-container">
             {% if item.image %}
-            <img src="{{ url_for('static', filename='product_images/' + item.image) }}" style="max-width: 200px; max-height: 200px;">
+            <img src="{{ url_for('static', filename='product_images/' + item.image) }}" style="max-width: 100px; max-height: 100px;">
             {% else %}
             No Image
             {% endif %}
           </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-2 content">
           {{ item.name }}
         </div>
-        <div class="col-sm-2">
-          Each
+        <div class="col-sm-2 content">
+          ${{ '%.2f'|format(item.price | float) }}
         </div>
-        <div class="col-sm-2">
-          <div class="row quantity-control" style="justify-content: start;">
-            Quantity
-          </div>
+        <div class="col-sm-2 content">
           <div class="row quantity-control">
             <div class="col-sm-4">
               <form action="/remove_item_from_cart/{{ product_id }}" method="POST">
@@ -98,24 +214,55 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-2">
-          Price
-          <br>
-          ${{ '%.2f'|format(item.price | float) }}
+        <div class="col-sm-2 content">
+          ${{ '%.2f'|format(item.subtotal | float) }}
+        </div>
+        <div class="col-sm-2 content">
+          <form action="/clear_item/{{ product_id }}" method="POST">
+            <button type="submit" class="clearItem">x</button>
+          </form>
         </div>
       </div>
     </div>
     {% endfor %}
+    {% else %}
+    <div class="cartIsEmpty">
+      Cart is empty
+    </div>
+    {% endif %}
   </div>
-  <hr>
-  <p>Total Price: ${{ '%.2f'|format(total_price) }}</p>
+  <div class="bottom">
+    <hr>
+    <div class="row header">
+      <div class="col-sm-2 count">
+        {% if cart_items %}
+        <p>{{ total_quantity }} items</p>
+        {% else %}
+        <p>0 items</p>
+        {% endif %}
+      </div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-2 value">Total Price</div>
+      <div class="col-sm-2 value total_price">${{ '%.2f'|format(total_price) }}</div>
+      <div class="col-sm-2"></div>
+    </div>
+    <div class="row header">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-6"><hr></div>
+    </div>
+    <div class="row header">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-2"></div>
+      <div class="col-sm-6">
+        <form action="/payment" method="POST">
+          <button type="submit" class="btn btn-primary paymentBtn">Proceed to payment</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
-      <!--
-      <form action="/remove_item_from_cart/{{ product_id }}" method="POST">
-        <button type="submit" class="btn btn-danger">Remove</button>
-      </form>
-      <form action="/add_item_to_cart/{{ product_id }}" method="POST">
-        <button type="submit" class="btn btn-danger">Add</button>
-      </form>
-      --->
