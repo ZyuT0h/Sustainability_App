@@ -52,6 +52,8 @@
                     <th>Postal Code</th>
                     <th>Shipping Address</th>
                     <th>Unit Number</th>
+                    <th>Payment Time</th>
+                    <th>Total Price</th>
                     <th>Order Status</th>
                 </tr>
             </thead>
@@ -61,6 +63,8 @@
                         <td>{{ order.postal_code }}</td>
                         <td>{{ order.shipping_address }}</td>
                         <td>{{ order.unit_number }}</td>
+                        <td>{{ payment_time }}</td>
+                        <td>{{ total_price }}</td>
                         <td>
                             <select class="status-dropdown">
                                 <option value="pending" {% if order.order_status == 'pending' %}selected{% endif %}>Pending</option>

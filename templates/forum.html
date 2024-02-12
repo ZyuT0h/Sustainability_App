@@ -50,13 +50,21 @@
     }
 
     .sbutton {
-        background-color: #28a745; /* Success button color */
+        background-color: #28a745;
         color: #fff;
     }
 
     .cbutton {
-        background-color: #dc3545; /* Danger button color */
+        background-color: #dc3545;
         color: #fff;
+    }
+
+    .sbutton:hover {
+    background-color: hsl(122, 63%, 40%);
+    }
+
+    .cbutton:hover {
+        background-color: hsl(348, 75%, 35%);
     }
 
     #commentsList {
@@ -140,7 +148,7 @@
         })
         .then(data => {
             if (data && data.status === 'success' && Array.isArray(data.comments)) {
-                // Clear the commentsList before appending new comments
+                alert("Comment has been added!")
                 var commentsList = document.getElementById("commentsList");
                 commentsList.innerHTML = "";
 
@@ -179,8 +187,8 @@
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // Update comments list
-            document.getElementById('commentsList').innerHTML = ""; // Clear existing comments
+            alert ("Successfully send out the reply!")
+            document.getElementById('commentsList').innerHTML = "";
             data.comments.forEach(function(comment, index) {
                 var commentDiv = document.createElement("div");
                 commentDiv.innerHTML = comment.username + ":<br>" +
