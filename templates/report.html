@@ -26,6 +26,10 @@
         <li><span>Rugs</span>: <input type="number" class="product-quantity" data-product="Rugs"></li>
     </ul>
 
+    <!-- Input field for total donation -->
+    <label for="total-donation">Total Donation for This Month:</label>
+    <input type="number" id="total-donation" placeholder="Enter total donation">
+
     <!-- Add the sales graph container -->
     <div id="sales-graph-container"></div>
 
@@ -50,6 +54,12 @@
             // Add data for other months as needed
         };
 
+        // Initialize the stored sales data from local storage
+        let storedSalesData = JSON.parse(localStorage.getItem('salesData')) || {};
+
+        // Initialize the stored total donation data from local storage
+        let storedTotalDonation = JSON.parse(localStorage.getItem('totalDonation')) || {};
+
         // Function to update the report based on selected month and year
         function updateReport() {
             var selectedMonth = document.getElementById('month').value;
@@ -58,8 +68,23 @@
             // Update report title
             document.getElementById('report-title').innerText = getMonthName(selectedMonth) + ' ' + selectedYear + ' Report';
 
+            // Get the stored sales data for the selected month and year
+            var sales = storedSalesData[selectedMonth]?.[selectedYear] || salesData[selectedMonth][selectedYear];
+
+            // Update input fields with the stored sales data
+            document.querySelectorAll('.product-quantity').forEach(function(input) {
+                var product = input.dataset.product;
+                input.value = sales[product];
+            });
+
+            // Get the stored total donation for the selected month and year
+            var totalDonation = storedTotalDonation[selectedMonth]?.[selectedYear] || '';
+
+            // Update the total donation input field
+            document.getElementById('total-donation').value = totalDonation;
+
             // Update sales graph
-            updateSalesGraph(salesData[selectedMonth][selectedYear]);
+            updateSalesGraph(sales);
         }
 
         // Function to update the sales graph
@@ -92,19 +117,29 @@
         document.getElementById('month').addEventListener('change', updateReport);
         document.getElementById('year').addEventListener('change', updateReport);
 
-        // Button click event to update the graph
+        // Add event listener to the button to update the graph
         document.getElementById('update-graph').addEventListener('click', function() {
+            // Update the stored sales data with the entered values
             var selectedMonth = document.getElementById('month').value;
             var selectedYear = document.getElementById('year').value;
-
             var sales = {};
             document.querySelectorAll('.product-quantity').forEach(function(input) {
                 var product = input.dataset.product;
                 var quantity = parseInt(input.value);
                 sales[product] = quantity;
             });
+            storedSalesData[selectedMonth] = storedSalesData[selectedMonth] || {};
+            storedSalesData[selectedMonth][selectedYear] = sales;
+            localStorage.setItem('salesData', JSON.stringify(storedSalesData));
 
-            updateSalesGraph(sales);
+            // Update the stored total donation with the entered value
+            var totalDonation = parseInt(document.getElementById('total-donation').value) || '';
+            storedTotalDonation[selectedMonth] = storedTotalDonation[selectedMonth] || {};
+            storedTotalDonation[selectedMonth][selectedYear] = totalDonation;
+            localStorage.setItem('totalDonation', JSON.stringify(storedTotalDonation));
+
+            // Update report
+            updateReport();
         });
 
         // Function to get month name from month number
@@ -114,3 +149,4 @@
         }
     </script>
 {% endblock %}
+
