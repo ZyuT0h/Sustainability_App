@@ -1,30 +1,116 @@
-<!-- report.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ report.month }} Report</title>
-</head>
-<body>
+{% extends "/base/base_admin.html" %}
+{% block title %}Report Generation{% endblock %}
 
-    {% include '/base/base_admin.html' %}
-    <h1>{{ report.month }} Report</h1>
+{% block content %}
+    <!-- Select dropdowns for month and year -->
+    <label for="month">Select Month:</label>
+    <select id="month">
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <!-- Add options for other months -->
+    </select>
+
+    <label for="year">Select Year:</label>
+    <select id="year">
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <!-- Add options for other years -->
+    </select>
+
+    <h1 id="report-title">January 2024 Report</h1>
     <h2>Sales Data:</h2>
-    <ul>
-        {% for product, quantity in report.sales.items() %}
-            <li>{{ product }}: {{ quantity }}</li>
-        {% endfor %}
-    </ul>
-    <h2>Most Profitable Product: {{ report.most_profitable_product }}</h2>
-    <h2>Donation Data:</h2>
-    <ul>
-        {% for donation, amount in report.donations.items() %}
-            <li>{{ donation }}: {{ amount }}</li>
-        {% endfor %}
+    <ul id="sales-list">
+        <li><span>Pouches</span>: <input type="number" class="product-quantity" data-product="Pouches"></li>
+        <li><span>Coasters</span>: <input type="number" class="product-quantity" data-product="Coasters"></li>
+        <li><span>Tote bags</span>: <input type="number" class="product-quantity" data-product="Tote bags"></li>
+        <li><span>Rugs</span>: <input type="number" class="product-quantity" data-product="Rugs"></li>
     </ul>
 
-    <!-- Include the chart -->
-    {% include 'chart.html' %}
-</body>
-</html>
+    <!-- Add the sales graph container -->
+    <div id="sales-graph-container"></div>
+
+    <!-- Button to update the graph -->
+    <button id="update-graph">Show Graph</button>
+
+    <!-- Include Plotly.js library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- Script to update report based on selected month and year -->
+    <script>
+        // Define simulated sales data for each month and year
+        const salesData = {
+            1: {
+                2024: { "Pouches": 100, "Coasters": 200, "Tote bags": 110, "Rugs": 50 },
+                2023: { "Pouches": 100, "Coasters": 200, "Tote bags": 110, "Rugs": 50 }
+            },
+            2: {
+                2024: { "Pouches": 150, "Coasters": 250, "Tote bags": 110, "Rugs": 50 },
+                2023: { "Pouches": 100, "Coasters": 200, "Tote bags": 110, "Rugs": 50 }
+            },
+            // Add data for other months as needed
+        };
+
+        // Function to update the report based on selected month and year
+        function updateReport() {
+            var selectedMonth = document.getElementById('month').value;
+            var selectedYear = document.getElementById('year').value;
+
+            // Update report title
+            document.getElementById('report-title').innerText = getMonthName(selectedMonth) + ' ' + selectedYear + ' Report';
+
+            // Update sales graph
+            updateSalesGraph(salesData[selectedMonth][selectedYear]);
+        }
+
+        // Function to update the sales graph
+        function updateSalesGraph(sales) {
+            var products = Object.keys(sales);
+            var quantities = Object.values(sales);
+
+            var trace = {
+                x: products,
+                y: quantities,
+                type: 'bar',
+                marker: {
+                    color: 'blue'
+                }
+            };
+
+            var layout = {
+                title: 'Sales Data',
+                xaxis: { title: 'Product' },
+                yaxis: { title: 'Quantity' }
+            };
+
+            Plotly.newPlot('sales-graph-container', [trace], layout);
+        }
+
+        // Call updateReport initially to populate the page with default month and year
+        updateReport();
+
+        // Add event listeners to update the report when month or year selection changes
+        document.getElementById('month').addEventListener('change', updateReport);
+        document.getElementById('year').addEventListener('change', updateReport);
+
+        // Button click event to update the graph
+        document.getElementById('update-graph').addEventListener('click', function() {
+            var selectedMonth = document.getElementById('month').value;
+            var selectedYear = document.getElementById('year').value;
+
+            var sales = {};
+            document.querySelectorAll('.product-quantity').forEach(function(input) {
+                var product = input.dataset.product;
+                var quantity = parseInt(input.value);
+                sales[product] = quantity;
+            });
+
+            updateSalesGraph(sales);
+        });
+
+        // Function to get month name from month number
+        function getMonthName(monthNumber) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[monthNumber - 1];
+        }
+    </script>
+{% endblock %}

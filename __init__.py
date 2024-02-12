@@ -339,9 +339,13 @@ def order_details():
     # Retrieve order details from session
     order_details = session.get('order_details')
     order_id = session.get('order_id')
+    payment_time = session.get('payment_time')
+    total_price = session.get('total_price')
     print("Order details in session:", order_details)
+    print("Payment Time in Session:", payment_time)
+    print("Total Price in Session:", total_price)
 
-    return render_template('order_details.html', order=order_details, order_id=order_id)
+    return render_template('order_details.html', order=order_details, order_id=order_id, payment_time=payment_time, total_price=total_price)
 
 @app.route('/staff_details')
 def staff_details():
@@ -929,7 +933,6 @@ def add_cus_ptss():
         return redirect(url_for('point_system'))
     return render_template('add_cus_ptss.html', form=add_cus_pts_form)
 
-
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
     # Log session data before setting customer_id
@@ -952,6 +955,12 @@ def payment():
     total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
 
     if request.method == 'POST':
+        # Capture the current time
+        payment_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print("Payment Time:", payment_time)
+        # Store the payment time in the session or database
+        session['payment_time'] = payment_time
+
         # Process the form submission
         shipping_address = request.form['U_SA']
         postal = request.form['U_P']
@@ -963,6 +972,10 @@ def payment():
 
         total_price_formatted = '{:.2f}'.format(total_price)
 
+        # Store the total price in the session
+        session['total_price'] = total_price_formatted
+        print("Total Price stored in session:", session['total_price'])  # Debug output
+
         with shelve.open('customer.db') as db:
             # Add the customer data to the database
             db['customer'] = {
@@ -973,36 +986,27 @@ def payment():
                 'expiry_date': expiry_date,
                 'cvc': cvc,
                 'card_name': card_name,
-                'total_price': total_price_formatted
+                'total_price': total_price_formatted,
+                'payment_time': payment_time
             }
 
-        with shelve.open('customer.db') as db:
-            # Retrieve customer data from the database
-            customer_data = db.get('customer', {})
-
-        # Construct response data using the retrieved customer data
-        response_data = {
-            'shipping_address': customer_data.get('shipping_address', ''),
-            'postal_code': customer_data.get('postal_code', ''),
-            'unit_number': customer_data.get('unit_number', ''),
-            'card_name': customer_data.get('card_name', ''),
-            # Add other data as needed
-            'cart_items': cart_items,
-            'total_price': total_price_formatted
-        }
-        return jsonify(response_data)
+        # Redirect to the receipt route with total_price as a parameter in the URL
+        return redirect(url_for('receipt'))
 
     return render_template('payment.html', cart_items=cart_items, total_price=total_price)
-
 
 @app.route('/receipt', methods=['GET'])
 def receipt():
     # Get payment information from the URL parameter
-    total_price = request.args.get('total_price', '')
+    total_price = session.get('total_price', '')
+    print("Total Price retrieved from session:", total_price)
 
     # Retrieve customer data from the database
     with shelve.open('customer.db') as db:
         customer_data = db.get('customer', {})
+
+    print("Total Price:", total_price)  # Debug output
+    print("Customer Data:", customer_data)  # Debug output
 
     # Construct payment information string
     payment_info = "Payment successful!<br><br>" + \
@@ -1025,7 +1029,6 @@ def receipt():
 
     # Render the receipt template with the payment information
     return render_template('receipt.html', payment_info=payment_info)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
