@@ -7,6 +7,13 @@
       font-family: Arial, sans-serif;
       background-color: #f8f9fa;
     }
+
+    h3 {
+        text-align: center;
+        margin: 20px auto;
+        margin-bottom: 15px;
+    }
+
     .container {
         width:10%;
         float: left;
@@ -17,6 +24,14 @@
         width:89%;
         float: right;
         border-radius: 5px;
+    }
+
+    .category-content {
+        background-color: #ffffff; /* Set a white background for the form */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        border-radius: 8px; /* Add rounded corners */
+        font-size: 14px;
+        padding: 10px;
     }
 
     form {
@@ -61,6 +76,18 @@
         margin-bottom: 0px;
         }
 
+    .productNone {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ffffff; /* Set a white background for the form */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        border-radius: 8px; /* Add rounded corners */
+        padding: 5px;
+        height: 241.98px;
+        opacity: 0.7;
+        margin-right: 12%;
+    }
     .col-sm-2 d-flex flex-column mt-auto > .mt-auto,   {
         display: flex;
         justify-content: center;
@@ -72,14 +99,18 @@
 <div class="container">
     <div class="category">
         <h5>Categories</h5>
-        <a href="#">Coaster</a><br>
-        <a href="#">Pouch</a><br>
-        <a href="#">Tote bag</a><br>
+        <div class="category-content">
+            <a href="{{ url_for('shop') }}">All product</a><br>
+            {% for category in categories %}
+            <a href="{{ url_for('category_page', category=category) }}">{{ category }}</a><br>
+            {% endfor %}
+        </div>
     </div>
 </div>
 <h5>&nbsp;&nbsp;&nbsp;Products</h5>
 <div class="container2">
     <div class="item">
+        {% if products_list %}
         {% for product in products_list %}
         <form action="/add_to_cart/{{ product.get_product_id() }}" method="POST" class="mb-3">
             <div class="row mb-3 mt-3">
@@ -121,6 +152,11 @@
             </div>
         </form>
         {% endfor %}
+        {% else %}
+            <div class="productNone">
+                No products available in this category :(
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

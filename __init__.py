@@ -398,7 +398,22 @@ def shop():
     for key in products_dict:
         product = products_dict.get(key)
         products_list.append(product)
-    return render_template('shop.html', products_list=products_list)
+
+    categories = get_categories()
+    return render_template('shop.html', products_list=products_list, categories=categories)
+
+
+@app.route('/shop/<category>')
+def category_page(category):
+    if category == category:
+        products_dict = {}
+        db = shelve.open('product.db', 'r')
+        products_dict = db['Products']
+        db.close()
+
+        products_list = [product for product in products_dict.values() if product.get_category() == category]
+        categories = get_categories()
+        return render_template('shop.html', products_list=products_list, categories=categories)
 
 
 @app.route('/cart')
@@ -476,6 +491,7 @@ def add_to_cart(id):
 
     return redirect(url_for('shop'))
 
+
 @app.route('/remove_item_from_cart/<int:id>', methods=['POST'])
 def remove_item_from_cart(id):
     try:
@@ -492,6 +508,7 @@ def remove_item_from_cart(id):
 
     except Exception as e:
         print('Error:', e)
+
 
 @app.route('/add_item_to_cart/<int:id>', methods=['POST'])
 def add_item_to_cart(id):
@@ -551,6 +568,7 @@ def add_category():
             db.close()
             return redirect(url_for('manage_category'))
     return render_template('addCategory.html')
+
 
 @app.route('/getCategories')
 def get_categories():
