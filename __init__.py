@@ -738,7 +738,7 @@ def forum():
 @app.route('/submit_comment', methods=['POST'])
 def submit_comment():
     data = request.get_json()
-    username = "C_username"  # Replace with the actual username after it can be retrieved
+    username = "Sarah"  # Replace with the actual username after it can be retrieved
 
     # Save the comment to the shelve file
     save_comment(username, data['subject'], data['message'])
