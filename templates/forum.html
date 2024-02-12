@@ -4,21 +4,6 @@
 {% block content %}
 
 <style>
-    .column{
-    width: 350px;
-    height: 350px;
-    margin: 12px 12px;
-
-  }
-.row{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-</style>
-
-<style>
     .row {
         display: flex;
         justify-content: space-around;
@@ -223,7 +208,7 @@
     {% endif %}
     <form onsubmit="event.preventDefault(); submitReply({{ comment_index }});">
         <input type="text" id="reply{{ comment_index }}" placeholder="Reply...">
-        <button type="submit">Submit Reply</button>
+        <button type="submit">Reply</button>
     </form>
     <hr>
     {% set comment_index = comment_index + 1 %}

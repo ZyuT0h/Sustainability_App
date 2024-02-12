@@ -51,25 +51,74 @@
             });
         }
     });
+
+    function submitReply(parentCommentIndex) {
+    var replyMessage = document.getElementById("reply" + parentCommentIndex).value;
+
+    fetch('/submit_reply', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            parent_comment_index: parentCommentIndex,
+            reply_message: replyMessage
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update comments list
+            document.getElementById('commentsList').innerHTML = ""; // Clear existing comments
+            data.comments.forEach(function(comment, index) {
+                var commentDiv = document.createElement("div");
+                commentDiv.innerHTML = comment.username + ":<br>" +
+                                       comment.subject + "<br>" +
+                                       comment.message + "<br>";
+                if (comment.replies) {
+                    comment.replies.forEach(function(reply) {
+                        commentDiv.innerHTML += "&nbsp;&nbsp;Reply: " + reply + "<br>";
+                    });
+                }
+                var replyForm = document.createElement("form");
+                replyForm.onsubmit = function(event) {
+                    event.preventDefault();
+                    submitReply(index);
+                };
+                replyForm.innerHTML = "<input type='text' id='reply" + index + "' placeholder='Reply...'>" +
+                                      "<button type='submit'>Submit Reply</button>";
+                commentDiv.appendChild(replyForm);
+                commentDiv.innerHTML += "<hr>";
+                document.getElementById('commentsList').appendChild(commentDiv);
+            });
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
 </script>
 <fieldset>
     <br>
     <h1>Forum</h1>
-{% if admin %}
-    <hr>
-    {% for comment in comments %}
-        {{ comment.username }}:<br>
-        {{ comment.subject }}<br>
-        {{ comment.message }}<br>
-        {% if comment.replies %}
-            {% for reply in comment.replies %}
-                &nbsp;&nbsp;Reply: {{ reply }}<br>
-            {% endfor %}
-        {% endif %}
-        <input type="text" placeholder="REPLY">
-        <button class="delete-comment" data-index="{{ loop.index - 1 }}">Delete</button>
+    {% if admin %}
         <hr>
-    {% endfor %}
-{% endif %}
+        {% for comment in comments %}
+            {{ comment.username }}:<br>
+            {{ comment.subject }}<br>
+            {{ comment.message }}<br>
+            {% if comment.replies %}
+                {% for reply in comment.replies %}
+                    &nbsp;&nbsp;Reply: {{ reply }}<br>
+                {% endfor %}
+            {% endif %}
+            <form onsubmit="event.preventDefault(); submitReply({{ loop.index - 1 }});">
+                <input type="text" id="reply{{ loop.index - 1 }}" placeholder="Reply...">
+                <button type="submit">Reply</button>
+            </form>
+            <button class="delete-comment" data-index="{{ loop.index - 1 }}">Delete</button>
+            <hr>
+        {% endfor %}
+    {% endif %}
 </fieldset>
 {% endblock %}
