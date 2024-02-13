@@ -1030,6 +1030,8 @@ def receipt():
 
     session['order_id'] = order_id
 
+    session.pop('cart', None)
+
     # Render the receipt template with the payment information
     return render_template('receipt.html', payment_info=payment_info)
 
