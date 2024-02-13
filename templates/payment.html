@@ -363,8 +363,8 @@ $(document).ready(function() {
             url: '/payment',
             data: $('#paymentForm').serialize(),
             success: function(response) {
-                var paymentInfo = "<h3>Payment Successful!</h3><br>" +
-                "<div class='address-info'><strong>Address Information:</strong><br><br>" +
+                var paymentInfo = "<h3>Payment Successful</h3><br>" +
+                "<div class='address-info'><strong>Address Information:</strong><br>" +
                 "Shipping Address: " + response.shipping_address + "<br>" +
                 "Postal Code: " + response.postal_code + "<br>" +
                 "Unit Number: " + response.unit_number + "<br></div>" +

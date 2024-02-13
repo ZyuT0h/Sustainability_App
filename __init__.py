@@ -933,34 +933,10 @@ def add_cus_ptss():
         return redirect(url_for('point_system'))
     return render_template('add_cus_ptss.html', form=add_cus_pts_form)
 
+
 @app.route('/payment', methods=['GET', 'POST'])
 def payment():
-    # Log session data before setting customer_id
-    app.logger.info("Session data before setting customer_id: %s", session)
-
-    # Set customer_id in session
-    customer_id = session.get('customer_id')
-    app.logger.info("Customer ID retrieved from session: %s", customer_id)
-
-    # Set customer email in session
-    customer_email = session.get('customer_email')
-    app.logger.info("Customer email retrieved from session: %s", customer_email)
-
-    # Log session data after setting customer_id
-    session['customer_id'] = customer_id
-    session['customer_email'] = customer_email
-    app.logger.info("Session data after setting customer_id: %s", session)
-
-    cart_items = session.get('cart', {})
-    total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
-
     if request.method == 'POST':
-        # Capture the current time
-        payment_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print("Payment Time:", payment_time)
-        # Store the payment time in the session or database
-        session['payment_time'] = payment_time
-
         # Process the form submission
         shipping_address = request.form['U_SA']
         postal = request.form['U_P']
@@ -970,30 +946,56 @@ def payment():
         cvc = request.form['U_CVC']
         card_name = request.form['U_CN']
 
-        total_price_formatted = '{:.2f}'.format(total_price)
+        # Store customer information in session
+        customer = {
+            'shipping_address': shipping_address,
+            'postal_code': postal,
+            'unit_number': unit_no,
+            'card_number': card_number,
+            'expiry_date': expiry_date,
+            'cvc': cvc,
+            'card_name': card_name
+        }
+        session['customer'] = customer
 
-        # Store the total price in the session
-        session['total_price'] = total_price_formatted
-        print("Total Price stored in session:", session['total_price'])  # Debug output
+        # Retrieve cart items from session
+        cart_items = session.get('cart', {})
+        total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
 
-        with shelve.open('customer.db') as db:
-            # Add the customer data to the database
-            db['customer'] = {
-                'shipping_address': shipping_address,
-                'postal_code': postal,
-                'unit_number': unit_no,
-                'card_number': card_number,
-                'expiry_date': expiry_date,
-                'cvc': cvc,
-                'card_name': card_name,
-                'total_price': total_price_formatted,
-                'payment_time': payment_time
-            }
+        # Construct response data including customer and cart details
+        response_data = {
+            'shipping_address': shipping_address,
+            'postal_code': postal,
+            'unit_number': unit_no,
+            'cart_items': cart_items,
+            'total_price': total_price
+        }
 
-        # Redirect to the receipt route with total_price as a parameter in the URL
-        return redirect(url_for('receipt'))
+        # Return the JSON response
+        return jsonify(response_data)
 
-    return render_template('payment.html', cart_items=cart_items, total_price=total_price)
+    else:
+        # Your existing code for GET requests handling
+        # Log session data before setting customer_id
+        app.logger.info("Session data before setting customer_id: %s", session)
+
+        # Set customer_id in session
+        customer_id = session.get('customer_id')
+        app.logger.info("Customer ID retrieved from session: %s", customer_id)
+
+        # Set customer email in session
+        customer_email = session.get('customer_email')
+        app.logger.info("Customer email retrieved from session: %s", customer_email)
+
+        # Log session data after setting customer_id
+        session['customer_id'] = customer_id
+        session['customer_email'] = customer_email
+        app.logger.info("Session data after setting customer_id: %s", session)
+
+        cart_items = session.get('cart', {})
+        total_price = sum(float(item['price']) * int(item['quantity']) for item in cart_items.values())
+
+        return render_template('payment.html', cart_items=cart_items, total_price=total_price)
 
 
 @app.route('/receipt', methods=['GET'])
