@@ -18,7 +18,7 @@
     </select>
 
     <h1 id="report-title">January 2024 Report</h1>
-    <h2>Sales Data:</h2>
+    <h2>Sales Data(Online & physical store):</h2>
     <ul id="sales-list">
         <li><span>Pouches</span>: <input type="number" class="product-quantity" data-product="Pouches"></li>
         <li><span>Coasters</span>: <input type="number" class="product-quantity" data-product="Coasters"></li>
@@ -27,7 +27,7 @@
     </ul>
 
     <!-- Input field for total donation -->
-    <label for="total-donation">Total Donation for This Month:</label>
+    <label for="total-donation" id="total-donation-label">Total Donation for January 2024:</label>
     <input type="number" id="total-donation" placeholder="Enter total donation">
 
     <!-- Add the sales graph container -->
@@ -82,6 +82,9 @@
 
             // Update the total donation input field
             document.getElementById('total-donation').value = totalDonation;
+
+            // Update the label for total donation based on the selected month and year
+            document.getElementById('total-donation-label').innerText = 'Total Donation for ' + getMonthName(selectedMonth) + ' ' + selectedYear + ':';
 
             // Update sales graph
             updateSalesGraph(sales);
